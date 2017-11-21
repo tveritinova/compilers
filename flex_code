@@ -1,0 +1,149 @@
+
+%{
+	#include <stdio.h>
+    #include <stdlib.h>
+    #include "grammar_declaration.h"
+    #include "visitor.h"
+    #include "tokens.h"
+
+    void preaction(const char* yytext);
+    #define YY_USER_ACTION preaction(yytext);
+
+    int lineNumber = 1;
+    int columnNumber = 1;
+
+    void preaction(const char* yytext) {
+        yylloc.first_line = yylloc.last_line = lineNumber;
+        yylloc.first_column = columnNumber;
+
+        for( int i = 0; i < strlen(yytext); i++ ) {
+            if( yytext[i] == '\n' ) {
+                lineNumber++;
+                columnNumber = 1;
+            } else {
+                columnNumber++;
+            }
+        }
+
+        yylloc.last_column = columnNumber;
+    }
+
+%}
+
+%option c++
+%option noyywrap
+
+
+DIGIT			[0-9]
+LETTER			[a-zA-z]+
+ID				{LETTER}({DIGIT}|{LETTER})*
+NUM         	[1-9]{DIGIT}*|0
+
+IF				if
+ELSE            else
+WHILE			while
+
+CLASS			class
+
+THIS			this
+NEW				new
+
+MAIN            "static void main"
+
+PUBLIC			public
+EXTENDS			extends
+
+INT 			int
+BOOL			boolean
+STRING			String
+
+TRUE            true
+FALSE           false
+
+RNDBR_L			"("
+RNDBR_R			")"
+BTBR_L			"{"
+BTBR_R			"}"
+
+COMMA			","
+DOT				"."
+SEMICOLON		";"
+
+EQ				"="	
+AND				"&&"
+OR				"||"
+PLUS			"+"
+MINUS			"-"
+STAR			"*"
+LESS			"<"
+EXCL			"!"
+
+LEN				length
+PRINT           System.out.println
+RETURN          return
+
+%%
+
+{IF}			return IF;
+{ELSE}          return ELSE;
+{WHILE}			return WHILE;
+
+{CLASS}			return CLASS;
+
+{TRUE}          return TRUE;
+{FALSE}         return FALSE; 
+
+{THIS}			return THIS;
+{NEW}			return NEW;
+
+{MAIN}          return MAIN;
+
+{PUBLIC}		return PUBLIC;
+{EXTENDS}		return EXTENDS;
+
+{INT} 			return INT;
+{BOOL}			return BOOL;
+{STRING}		return STRING;
+
+"\["    		return SQBR_L;
+"\]"    		return SQBR_R;
+{RNDBR_L}		return RNDBR_L;
+{RNDBR_R}		return RNDBR_R;
+{BTBR_L}		return BTBR_L;
+{BTBR_R}		return BTBR_R;
+
+{COMMA}			return COMMA;
+{DOT}			return DOT;
+{SEMICOLON}		return SEMICOLON;
+
+{EQ}			return EQ;
+{AND}			return AND;
+{OR}			return OR;
+{PLUS}			return PLUS;
+{MINUS}			return MINUS;
+{STAR}			return STAR;
+{LESS}			return LESS;
+{EXCL}			return EXCL;
+
+{LEN}			return LEN;
+{PRINT}         return PRINT;
+{RETURN}        return RETURN;
+
+{ID}            yylval.strValue = yytext; return ID;
+{NUM}           yylval.intval = atoi(yytext); return NUM;
+
+"//".*          
+[ \t\n\r]+        
+
+<<EOF>>         return 0;    
+
+.               printf("\n wrong at %d,%d\n", lineNumber, columnNumber);
+
+%%
+
+yyFlexLexer lexer;
+
+extern "C" int yylex()
+{
+    return lexer.yylex();
+}

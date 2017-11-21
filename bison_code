@@ -1,0 +1,389 @@
+
+%{
+  #include <iostream>
+  #include <string>
+  #include "grammar.h"
+  #include "treeserializer.h"
+
+  extern "C" int yylex();
+
+  void yyerror(const char* str)
+  {
+      std::cerr << "ERROR: " << str << std::endl;
+  }
+
+  TreeSerializer *pp = new TreeSerializer();
+%}
+
+%locations
+
+%token IF;
+%token ELSE;
+%token WHILE;
+
+%token CLASS;
+
+%token THIS;
+%token NEW;
+
+%token MAIN;
+
+%token PUBLIC;
+%token EXTENDS;
+
+%token INT;
+%token BOOL;
+%token STRING;
+
+%token SQBR_L;
+%token SQBR_R;
+%token RNDBR_L;
+%token RNDBR_R;
+%token BTBR_L;
+%token BTBR_R;
+
+%token COMMA;
+%token DOT;
+%token SEMICOLON;
+
+%token EQ;
+%token AND;
+%token OR;
+%token PLUS;
+%token MINUS;
+%token STAR;
+%token LESS;
+%token EXCL;
+
+%token FALSE;
+%token TRUE;
+
+%token PRINT;
+
+%token LEN;
+
+%token RETURN;
+
+%token  END 0
+
+%token  <intval>  NUM
+%token  <strValue> ID
+
+
+%union {
+    Symbol* symbol;
+    int intval;
+    char* strValue;
+    Program* program;
+    MainClass* main_class;
+    ClassDecl *class_dec;
+    ClassDeclList *class_dec_list;
+    VarDecl* var_dec;
+    VarDeclList* var_dec_list;
+    MethodDecl* method;
+    MethodDeclList* method_list;
+    ArgumentList* arg_list;
+    Type* type;
+    StatementList* statement_list;
+    Statement* statement;
+    ExpressionList* expression_list;
+    Expression* expression;
+    Symbol* id;
+}
+
+%type   <id>                id;
+%type   <program>           goal
+%type   <main_class>        main_class
+%type   <class_dec_list>    class_dec_list
+%type   <class_dec>         class_dec
+%type   <var_dec_list>      var_dec_list
+%type   <var_dec>           var_dec
+%type   <method_list>   method_list
+%type   <method>        method
+%type   <arg_list>          arglist
+%type   <type>              type
+%type   <statement_list>    stmnt_list
+%type   <statement>         statement
+%type   <expression_list>   expression_list
+
+%type   <expression>        expression
+%type   <id>                extends_block
+
+%nonassoc AND
+%nonassoc LESS
+
+%left MINUS PLUS
+%left STAR
+%left DOT
+%left SQBR_L
+%right EXCL
+
+%start goal
+
+%%
+
+
+goal : { printf("empty\n"); }
+
+    | main_class 
+
+        { printf("goal\n"); /*$$ = new Program($1, $2);*/ }
+;
+
+
+main_class : 
+
+      CLASS id BTBR_L 
+        PUBLIC MAIN RNDBR_L STRING SQBR_L SQBR_R id RNDBR_R
+        BTBR_L statement BTBR_R
+      BTBR_R
+
+        { printf("main class\n"); }
+;
+
+
+class_dec :
+
+      CLASS id extends_block BTBR_R
+        var_dec_list 
+        method_list
+      BTBR_R
+
+        { $$ = new ClassDecl($2, $3, $5, $6); }
+;
+
+
+class_dec_list :
+
+      class_dec_list class_dec
+
+        { $$ = new ClassDeclList($2, $1); }
+
+    |   { printf("empty class dec\n"); $$ = nullptr; }
+;
+
+
+extends_block :
+      
+      EXTENDS id
+
+        { $$ = $2; }
+
+    |   { printf("empty extends block\n"); $$ = nullptr; }
+;
+
+
+var_dec:
+
+      type id SEMICOLON
+
+        { $$ = new VarDecl($1, $2); }
+;
+
+
+var_dec_list: 
+
+      var_dec_list var_dec
+
+        { $$ = new VarDeclList($2, $1); }
+
+    | var_dec  
+
+        { $$ = new VarDeclList($1, nullptr); };
+
+
+method : 
+
+      PUBLIC type id 
+      RNDBR_L arglist RNDBR_R 
+      BTBR_L 
+        var_dec_list 
+        stmnt_list 
+        RETURN expression SEMICOLON 
+      BTBR_R
+
+        { $$ = new MethodDecl($2, $3, $5, $8, $9, $11); }
+;
+
+
+method_list: 
+    
+      method_list method
+      
+        { $$ = new MethodDeclList($2, $1); }
+    
+    |   { printf("empty method decl\n"); $$ = nullptr; }
+;
+
+
+arglist: 
+
+      arglist COMMA type id 
+
+        { $$ = new ArgumentList($3, $4, $1); }
+
+    | type id
+
+        { $$ = new ArgumentList($1, $2, nullptr); }
+
+    |   { $$ = nullptr; }
+; 
+
+
+stmnt_list: 
+
+      stmnt_list statement  
+
+        { $$ = new StatementList($2, $1); }
+
+    | statement  
+
+        { $$ = new StatementList($1, nullptr); };
+
+
+type:
+
+      INT SQBR_L SQBR_R
+
+        { $$ = new BasicType(INT_ARRAY_); }
+
+    | BOOL
+
+        { $$ = new BasicType(BOOL_); }
+
+    | INT
+
+        { $$ = new BasicType(INT_); }
+
+    | id
+
+        { $$ = new ClassType((Symbol *)($1)); }
+;
+
+
+statement : 
+
+      BTBR_L stmnt_list BTBR_R 	
+
+        { $$ = $2; }
+
+  	| IF RNDBR_L expression RNDBR_R statement ELSE statement  
+
+        { $$ = new IfStatement($3, $5, $7); }
+
+  	| WHILE RNDBR_L expression RNDBR_R statement 	
+
+        { $$ = new WhileStatement($3, $5); }
+
+		| PRINT RNDBR_L expression RNDBR_R SEMICOLON 	
+
+        { printf("println\n"); $$ = new PrintStatement($3); }
+
+  	| id EQ expression SEMICOLON 	
+
+        { $$ = new AssignStatement($1, $3); }
+
+  	| id SQBR_L expression SQBR_R EQ expression SEMICOLON 	
+
+        { $$ = new AssignSubscriptStatement($1, $3, $6); }
+;
+
+
+expression : 
+
+      expression AND expression 		
+
+        { $$ = new BinaryExpression($1, BinaryOperator::AND_, $3); }
+
+    | expression LESS expression 		
+
+        { $$ = new BinaryExpression($1, BinaryOperator::LESS_, $3); }
+
+		| expression PLUS expression 		
+
+        { $$ = new BinaryExpression($1, BinaryOperator::ADD_, $3); }
+
+		| expression MINUS expression 	
+
+        { $$ = new BinaryExpression($1, BinaryOperator::SUB_, $3); }
+
+    | expression STAR expression  	
+
+        { $$ = new BinaryExpression($1, BinaryOperator::MUL_, $3); }
+
+		| expression SQBR_L expression SQBR_R		
+
+        { $$ = new SubscriptExpression($1, $3); }
+
+		| expression DOT LEN	
+
+        { $$ = new LengthExpression($1); }
+
+		| expression DOT id RNDBR_L expression_list RNDBR_R 	
+
+        { $$ = new MethodCallExpression($1, $3, $5); }
+
+		| NUM  	
+
+        { $$ = new IntExpression(yylval.intval); }
+
+		| TRUE 	
+
+        { printf("true\n"); $$ = new BoolExpression(true); }
+
+		| FALSE 
+
+        { $$ = new BoolExpression(false); }
+
+		| id 
+
+        { $$ = new IdExpression($1); }
+
+		| THIS 
+
+        { $$ = new ThisExpression(); }
+
+		| NEW INT SQBR_L expression SQBR_R 
+
+        { $$ = new NewIntArrayExpression($4); }
+
+		| NEW id RNDBR_L RNDBR_R 
+
+        { $$ = new NewObjectExpression($2); }
+
+		| EXCL expression 
+
+        { $$ = new NegationExpression($2); }
+
+		| RNDBR_L expression RNDBR_R 
+
+        { $$ = $2; }
+;
+
+
+expression_list:
+
+      expression_list COMMA expression  
+      
+        { printf("expression list\n"); $$ = new ExpressionList($3, $1); }
+    
+    | expression
+
+        { printf("expression\n"); $$ = new ExpressionList($1, nullptr); }
+;
+
+
+id : 
+
+      ID 
+
+        { printf("id %s\n", yyval.strValue); $$ = new Symbol(yyval.strValue);} 
+;
+
+%%
+
+
+int main(void) {
+    yyparse();
+    delete pp;
+}
