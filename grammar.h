@@ -11,12 +11,11 @@
 class Program : public Visitable {
 
 public:
-    Program(const MainClass* main_class, const ClassDeclList* other_classes) :
-        _main_class(main_class), _classes(other_classes)
-    { }
 
-    virtual void accept(Visitor* visitor) const override
-    {
+    Program(const MainClass* main_class, const ClassDeclList* other_classes) :
+        _main_class(main_class), _classes(other_classes) {}
+
+    virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
     }
 
@@ -24,33 +23,31 @@ public:
     const ClassDeclList* _classes;
 };
 
-class Symbol : public Visitable
-{
+class Symbol : public Visitable {
+
 public:
+
     Symbol(std::string str) : str_(std::move(str)) {}
 
-    const std::string& to_string() const
-    {
+    const std::string& to_string() const {
         return str_;
     }
 
-    virtual void accept(Visitor* visitor) const override
-    {
+    virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
     }
 
     std::string str_;
 };
 
-class MainClass: public Visitable
-{
-public:
-    MainClass(const Symbol* class_id, const Symbol* main_argv_id, const Statement* main_body)
-        : _class_id(class_id), _main_argv_id(main_argv_id), _main_body(main_body)
-    { }  
+class MainClass: public Visitable {
 
-    virtual void accept(Visitor* visitor) const override
-    {
+public:
+
+    MainClass(const Symbol* class_id, const Symbol* main_argv_id, const Statement* main_body)
+        : _class_id(class_id), _main_argv_id(main_argv_id), _main_body(main_body) {}  
+
+    virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
     }
 
@@ -59,16 +56,15 @@ public:
     const Statement* _main_body;
 };
 
-class ClassDecl: public Visitable
-{
+class ClassDecl: public Visitable {
+
 public:
+
     ClassDecl(const Symbol* class_id, const Symbol* base_class_id,
         const VarDeclList* variables, const MethodDeclList* methods)
-        : _class_id(class_id), _base_class_id(base_class_id), _vars(variables), _methods(methods)
-    { }
+        : _class_id(class_id), _base_class_id(base_class_id), _vars(variables), _methods(methods) {}
 
-    virtual void accept(Visitor* visitor) const override
-    {
+    virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
     }
 
@@ -78,15 +74,14 @@ public:
     const MethodDeclList* _methods;
 };
 
-class ClassDeclList: public Visitable
-{
-public:
-    ClassDeclList(const ClassDecl* new_class, const ClassDeclList* other_classes)
-        : _new_class(new_class), _other_classes(other_classes)
-    { }
+class ClassDeclList: public Visitable {
 
-    virtual void accept(Visitor* visitor) const override
-    {
+public:
+
+    ClassDeclList(const ClassDecl* new_class, const ClassDeclList* other_classes)
+        : _new_class(new_class), _other_classes(other_classes) {}
+
+    virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
     }
 
@@ -95,15 +90,13 @@ public:
     const ClassDeclList* _other_classes;
 };
 
-class VarDecl: public Visitable
-{
+class VarDecl: public Visitable {
+
 public:
     VarDecl(const Type* type, const Symbol* var_id)
-        : _type(type), _var_id(var_id)
-    { }
+        : _type(type), _var_id(var_id) {}
 
-    virtual void accept(Visitor* visitor) const override
-    {
+    virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
     }
 
@@ -111,15 +104,14 @@ public:
     const Symbol* _var_id;
 };
 
-class VarDeclList: public Visitable
-{
-public:
-    VarDeclList(const VarDecl* var_decl, const VarDeclList* other_var_decls)
-        : _var_dec(var_decl), _other_var_decs(other_var_decls)
-    { }
+class VarDeclList: public Visitable {
 
-    virtual void accept(Visitor* visitor) const override
-    {
+public:
+
+    VarDeclList(const VarDecl* var_decl, const VarDeclList* other_var_decls)
+        : _var_dec(var_decl), _other_var_decs(other_var_decls) {}
+
+    virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
     }
 
@@ -127,15 +119,14 @@ public:
     const VarDeclList* _other_var_decs;
 };
 
-class MethodDeclList: public Visitable
-{
-public:
-    MethodDeclList(const MethodDecl* method, const MethodDeclList* other_methods_decls)
-        : method_decl_(method), other_methods_decls_(other_methods_decls)
-    { }
+class MethodDeclList: public Visitable {
 
-    virtual void accept(Visitor* visitor) const override
-    {
+public:
+
+    MethodDeclList(const MethodDecl* method, const MethodDeclList* other_methods_decls)
+        : method_decl_(method), other_methods_decls_(other_methods_decls) {}
+
+    virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
     }
 
@@ -143,16 +134,16 @@ public:
     const MethodDeclList* other_methods_decls_;
 };
 
-class MethodDecl: public Visitable
-{
+class MethodDecl: public Visitable {
+
 public:
+
     MethodDecl(const Type* return_type, const Symbol* method_id, const ArgumentList* arg_list,
         const VarDeclList* var_decls, const StatementList* statements, const Expression* return_expression)
         : return_type_(return_type), method_id_(method_id), arg_list_(arg_list),
           var_decls_(var_decls), statements_(statements), return_expression_(return_expression) {}
     
-    virtual void accept(Visitor* visitor) const override
-    {
+    virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
     }
 
@@ -164,15 +155,14 @@ public:
     const Expression* return_expression_;
 };
 
-class ArgumentList: public Visitable
-{
-public:
-    ArgumentList(const Type* arg_type, const Symbol* arg_id, const ArgumentList* other_args)
-        : arg_type_(arg_type), arg_id_(arg_id), other_args_(other_args)
-    { }
+class ArgumentList: public Visitable {
 
-    virtual void accept(Visitor* visitor) const override
-    {
+public:
+
+    ArgumentList(const Type* arg_type, const Symbol* arg_id, const ArgumentList* other_args)
+        : arg_type_(arg_type), arg_id_(arg_id), other_args_(other_args) {}
+
+    virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
     }
 
@@ -181,22 +171,20 @@ public:
     const ArgumentList* other_args_;
 };
 
-class Statement : public Visitable
-{ };
+class Statement : public Visitable {};
 
-class StatementList : public Statement
-{
+class StatementList : public Statement {
+
 public:
-    StatementList(Statement* statement, StatementList* other_statements)
-        : statement_(statement), other_statements_(other_statements)
-    { }
 
-    virtual void accept(Visitor* visitor) const override
-    {
+    StatementList(Statement* statement, StatementList* other_statements)
+        : statement_(statement), other_statements_(other_statements) {}
+
+    virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
     }
 
-    std::vector<Statement * > getVector(){
+    std::vector<Statement*> getVector() {
 
         std::vector<Statement*>* res = new std::vector<Statement*>();
 
@@ -214,16 +202,17 @@ public:
     StatementList* other_statements_;
 };
 
-class IfStatement : public Statement
-{
+class IfStatement : public Statement {
+
 public:
+
     IfStatement(const Expression* if_condition, const Statement* statement_if_true,
         const Statement* statement_if_false)
-        : if_condition_(if_condition), statement_if_true_(statement_if_true), statement_if_false_(statement_if_false)
-    { }
+        : if_condition_(if_condition), 
+        statement_if_true_(statement_if_true), 
+        statement_if_false_(statement_if_false) {}
 
-    virtual void accept(Visitor* visitor) const override
-    {
+    virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
     }
 
@@ -232,15 +221,14 @@ public:
     const Statement* statement_if_false_;
 };
 
-class WhileStatement : public Statement
-{
-public:
-    WhileStatement(const Expression* loop_condition, const Statement* inloop_statement)
-        : loop_condition_(loop_condition), inloop_statement_(inloop_statement)
-    { }
+class WhileStatement : public Statement {
 
-    virtual void accept(Visitor* visitor) const override
-    {
+public:
+
+    WhileStatement(const Expression* loop_condition, const Statement* inloop_statement)
+        : loop_condition_(loop_condition), inloop_statement_(inloop_statement) {}
+
+    virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
     }
 
@@ -248,29 +236,27 @@ public:
     const Statement* inloop_statement_;
 };
 
-class PrintStatement : public Statement
-{
-public:
-    PrintStatement(const Expression* expression_to_print) : expression_to_print_(expression_to_print)
-    { }
+class PrintStatement : public Statement {
 
-    virtual void accept(Visitor* visitor) const override
-    {
+public:
+
+    PrintStatement(const Expression* expression_to_print) : expression_to_print_(expression_to_print) {}
+
+    virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
     }
 
     const Expression* expression_to_print_;
 };
 
-class AssignStatement : public Statement
-{
-public:
-    AssignStatement(const Symbol* lhs_var_id, const Expression* rhs_expression)
-        : lhs_var_id_(lhs_var_id), rhs_expression_(rhs_expression)
-    { }
+class AssignStatement : public Statement {
 
-    virtual void accept(Visitor* visitor) const override
-    {
+public:
+
+    AssignStatement(const Symbol* lhs_var_id, const Expression* rhs_expression)
+        : lhs_var_id_(lhs_var_id), rhs_expression_(rhs_expression) {}
+
+    virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
     }
 
@@ -278,16 +264,15 @@ public:
     const Expression* rhs_expression_;
 };
 
-class AssignSubscriptStatement : public Statement
-{
+class AssignSubscriptStatement : public Statement {
+
 public:
+
     AssignSubscriptStatement(const Symbol* lhs_array_id, const Expression* subscript,
         const Expression* rhs_expression)
-        : lhs_array_id_(lhs_array_id), subscript_(subscript), rhs_expression_(rhs_expression)
-    { }
+        : lhs_array_id_(lhs_array_id), subscript_(subscript), rhs_expression_(rhs_expression) {}
 
-    virtual void accept(Visitor* visitor) const override
-    {
+    virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
     }
 
@@ -296,213 +281,196 @@ public:
     const Expression* rhs_expression_;
 };
 
-class ExpressionList : public Visitable
-{
-public:
-    ExpressionList(const Expression* expression, const ExpressionList* other_expressions)
-        : expression_(expression), other_expressions_(other_expressions)
-    { }
+class ExpressionList : public Visitable {
 
-    virtual void accept(Visitor* visitor) const override
-    {
+public:
+    
+    ExpressionList(const Expression* expression, const ExpressionList* other_expressions)
+        : expression_(expression), other_expressions_(other_expressions) {}
+
+    virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
     }
 
-/*private:*/
     const Expression* expression_;
     const ExpressionList* other_expressions_;
 };
 
-struct Expression : public Visitable
-{ };
+class Expression : public Visitable {};
 
-enum class BinaryOperator 
-{
+enum class BinaryOperator {
     ADD_, SUB_, MUL_, DIV_, MOD_, AND_, OR_, LESS_
 };
 
-class BinaryExpression : public Expression
-{
+class BinaryExpression : public Expression {
+
 public:
+    
     BinaryExpression(const Expression* lhs_expression, BinaryOperator binary_operator,
         const Expression* rhs_expression)
-        : lhs_expression_(lhs_expression), binary_operator_(binary_operator), rhs_expression_(rhs_expression)
-    { }
+        : lhs_expression_(lhs_expression), 
+        binary_operator_(binary_operator), 
+        rhs_expression_(rhs_expression) {}
 
-    virtual void accept(Visitor* visitor) const override
-    {
+    virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
     }
 
-/*private:*/
     const Expression* lhs_expression_;
     BinaryOperator binary_operator_;
     const Expression* rhs_expression_;
 };
 
-class SubscriptExpression : public Expression
-{
-public:
-    SubscriptExpression(const Expression* expression, const Expression* subscript)
-        : expression_(expression), subscript_(subscript)
-    { }
+class SubscriptExpression : public Expression {
 
-    virtual void accept(Visitor* visitor) const override
-    {
+public:
+    
+    SubscriptExpression(const Expression* expression, const Expression* subscript)
+        : expression_(expression), subscript_(subscript) {}
+
+    virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
     }
 
-/*private:*/
     const Expression* expression_;
     const Expression* subscript_;
 };
 
-class LengthExpression : public Expression
-{
-public:
-    LengthExpression(const Expression* expression) : expression_(expression)
-    { }
+class LengthExpression : public Expression {
 
-    virtual void accept(Visitor* visitor) const override
-    {
+public:
+    
+    LengthExpression(const Expression* expression) : expression_(expression) {}
+
+    virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
     }
 
-/*private:*/
     const Expression* expression_;
 };
 
-class MethodCallExpression : public Expression
-{
+class MethodCallExpression : public Expression {
+
 public:
+
     MethodCallExpression(const Expression* expression, const Symbol* method_id,
         const ExpressionList* other_expressions)
-        : expression_(expression), method_id_(method_id), other_expressions_(other_expressions)
-    { }
+        : expression_(expression), 
+        method_id_(method_id), 
+        other_expressions_(other_expressions) {}
 
-    virtual void accept(Visitor* visitor) const override
-    {
+    virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
     }
 
-/*private:*/
     const Expression* expression_;
     const Symbol* method_id_;
     const ExpressionList* other_expressions_;
 };
 
-class IntExpression : public Expression
-{
-public:
-    IntExpression(int val_) : val(val_)
-    { }
+class IntExpression : public Expression {
 
-    virtual void accept(Visitor* visitor) const override
-    {
+public:
+    
+    IntExpression(int val_) : val(val_) {}
+
+    virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
     }
 
-    const int val;
+    int val;
 };
 
-class BoolExpression : public Expression
-{
-public:
-    BoolExpression(bool b) : b_(b)
-    { }
+class BoolExpression : public Expression {
 
-    virtual void accept(Visitor* visitor) const override
-    {
+public:
+    
+    BoolExpression(bool b) : b_(b) {}
+
+    virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
     }
 
-/*private:*/
     bool b_;
 };
 
-class IdExpression : public Expression
-{
-public:
-    IdExpression(const Symbol* id) : id_(id)
-    { }
+class IdExpression : public Expression {
 
-    virtual void accept(Visitor* visitor) const override
-    {
+public:
+    
+    IdExpression(const Symbol* id) : id_(id) {}
+
+    virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
     }
 
-/*private:*/
     const Symbol* id_;
 };
 
-class ThisExpression : public Expression
-{
-    virtual void accept(Visitor* visitor) const override
-    {
+class ThisExpression : public Expression {
+
+public:
+
+    virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
     }
 };
 
-class NewIntArrayExpression : public Expression
-{
-public:
-    NewIntArrayExpression(const Expression* subscript_expression)
-        : subscript_expression_(subscript_expression)
-    { }
+class NewIntArrayExpression : public Expression {
 
-    virtual void accept(Visitor* visitor) const override
-    {
+public:
+    
+    NewIntArrayExpression(const Expression* subscript_expression)
+        : subscript_expression_(subscript_expression) {}
+
+    virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
     }
 
     const Expression* subscript_expression_;
 };
 
-class NewObjectExpression : public Expression
-{
-public:
-    NewObjectExpression(Symbol* type) : new_object_type_(type)
-    { }
+class NewObjectExpression : public Expression {
 
-    virtual void accept(Visitor* visitor) const override
-    {
+public:
+    
+    NewObjectExpression(Symbol* type) : new_object_type_(type) {}
+
+    virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
     }
 
     Symbol* new_object_type_;
 };
 
-class NegationExpression : public Expression
-{
-public:
-    NegationExpression(const Expression* expression) : expression_to_negate_(expression)
-    { }
+class NegationExpression : public Expression {
 
-    virtual void accept(Visitor* visitor) const override
-    {
+public:
+    
+    NegationExpression(const Expression* expression) : expression_to_negate_(expression) {}
+
+    virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
     }
 
-/*private:*/
     const Expression* expression_to_negate_;
 };
 
-class UnaryMinusExpression : public Expression
-{
-public:
-    UnaryMinusExpression(const Expression* expression) : expression_(expression)
-    { }
+class UnaryMinusExpression : public Expression {
 
-    virtual void accept(Visitor* visitor) const override
-    {
+public:
+    
+    UnaryMinusExpression(const Expression* expression) : expression_(expression) {}
+
+    virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
     }
 
     const Expression* expression_;
 };
 
-class Type
-{
+class Type {
+    
 public:
     std::string label;
 };

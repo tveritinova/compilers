@@ -13,13 +13,7 @@ class MethodDeclList;
 class MethodDecl;
 class ArgumentList;
 
-class Type;
-class UserDefinedType;
-class PrimitiveType;
-class ArrayType;
-
 class Statement;
-class Statements;
 class StatementList;
 class AssignSubscriptStatement;
 class PrintStatement;
@@ -43,5 +37,9 @@ class NewObjectExpression;
 class BinaryExpression;
 class NegationExpression;
 class UnaryMinusExpression;
+
+class Type;
+class BasicType;
+class ClassType;
 
 #endif //MINIJAVAC_GRAMMAR_DEF_H

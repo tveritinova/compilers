@@ -33,9 +33,11 @@
 %option c++
 %option noyywrap
 
+SQBR_L          "\["            
+SQBR_R          "\]"        
 
 DIGIT			[0-9]
-LETTER			[a-zA-z]+
+LETTER			[a-zA-Z_]
 ID				{LETTER}({DIGIT}|{LETTER})*
 NUM         	[1-9]{DIGIT}*|0
 
@@ -105,8 +107,8 @@ RETURN          return
 {BOOL}			return BOOL;
 {STRING}		return STRING;
 
-"\["    		return SQBR_L;
-"\]"    		return SQBR_R;
+{SQBR_L}        return SQBR_L;
+{SQBR_R}    	return SQBR_R;
 {RNDBR_L}		return RNDBR_L;
 {RNDBR_R}		return RNDBR_R;
 {BTBR_L}		return BTBR_L;
@@ -129,8 +131,9 @@ RETURN          return
 {PRINT}         return PRINT;
 {RETURN}        return RETURN;
 
-{ID}            yylval.strValue = yytext; return ID;
-{NUM}           yylval.intval = atoi(yytext); return NUM;
+
+{LETTER}({DIGIT}|{LETTER})*   { yylval.strValue = yytext; return ID;}
+{NUM}           { yylval.intval = atoi(yytext); return NUM; }
 
 "//".*          
 [ \t\n\r]+        

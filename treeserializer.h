@@ -1,7 +1,7 @@
 
 #include <string>
 #include <array>
-#include <sstream>
+#include <fstream>
 #include <queue>
 
 #include "visitor.h"
@@ -10,9 +10,10 @@
 class TreeSerializer : public Visitor
 {
 public:
-    TreeSerializer();
+    TreeSerializer(std::string path);
+    ~TreeSerializer();
 
-    std::string ast_tree_to_dot(const Program* program);
+    //std::string ast_tree_to_dot(const Program* program);
 
     void visit(const Program*) override;
     void visit(const Symbol*) override;
@@ -26,12 +27,7 @@ public:
     void visit(const MethodDecl*) override;
     void visit(const ArgumentList*) override;
 
-    //void visit(const UserDefinedType*) override;
-    //void visit(const PrimitiveType*) override;
-    //void visit(const ArrayType*) override;
-
     void visit(const StatementList*) override;
-    //void visit(const Statements*) override;
     void visit(const AssignSubscriptStatement*) override;
     void visit(const PrintStatement*) override;
     void visit(const IfStatement*) override;
@@ -57,6 +53,7 @@ private:
     {
         PROGRAM,
         SYMBOL,
+        INTEGER,
         MAIN_CLASS,
         CLASS_DECL_LIST,
         CLASS_DECL,
@@ -90,7 +87,7 @@ private:
 
     static const std::size_t NUM_SYNTAX_TYPES = UNARY_MINUS_EXPRESSION + 1;
 
-    std::stringstream dot_stream_;
+    std::ofstream dot_stream_;
     SyntaxType parent_;
     std::array<std::size_t, NUM_SYNTAX_TYPES> syntax_counter_;
     std::array<std::string, NUM_SYNTAX_TYPES> syntax_label_;

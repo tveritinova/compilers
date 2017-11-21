@@ -2,10 +2,12 @@
 #include "treeserializer.h"
 #include <iostream>
 
-TreeSerializer::TreeSerializer() : dot_stream_(), parent_(PROGRAM), syntax_counter_(), syntax_label_()
-{
+TreeSerializer::TreeSerializer(std::string path) 
+: dot_stream_(), parent_(PROGRAM), syntax_counter_(), syntax_label_() {
+
     syntax_label_[PROGRAM] = "Program";
     syntax_label_[SYMBOL] = "Symbol";
+    syntax_label_[INTEGER] = "int";
     syntax_label_[MAIN_CLASS] = "MainClass";
     syntax_label_[CLASS_DECL_LIST] = "ClassDeclList";
     syntax_label_[CLASS_DECL] = "ClassDecl";
@@ -33,21 +35,17 @@ TreeSerializer::TreeSerializer() : dot_stream_(), parent_(PROGRAM), syntax_count
     syntax_label_[BINARY_EXPRESSION] = "BinaryExpression";
     syntax_label_[NEGATION_EXPRESSION] = "NegationExpression";
     syntax_label_[UNARY_MINUS_EXPRESSION] = "UnaryMinusExpression";
+
+    dot_stream_.open(path);
+    dot_stream_ << "digraph g {\n" << "\n";
 }
 
-std::string TreeSerializer::ast_tree_to_dot(const Program* program)
-{
-    dot_stream_.str({});
-
-    dot_stream_ << "digraph ast {\n";
-    program->accept(this);
+TreeSerializer::~TreeSerializer() {
     dot_stream_ << "}";
-    return dot_stream_.str();
+    dot_stream_.close();
 }
 
-void TreeSerializer::add_edge_(TreeSerializer::SyntaxType from, TreeSerializer::SyntaxType to)
-{
-    std::cerr << "add edge" << std::endl;
+void TreeSerializer::add_edge_(TreeSerializer::SyntaxType from, TreeSerializer::SyntaxType to) {
     dot_stream_ << "\t";
     add_vertex_(from);
     dot_stream_ << "->";
@@ -56,15 +54,12 @@ void TreeSerializer::add_edge_(TreeSerializer::SyntaxType from, TreeSerializer::
     dot_stream_ << ";\n";
 }
 
-void TreeSerializer::add_vertex_(TreeSerializer::SyntaxType syntax_type)
-{
-    std::cerr << "add vertex" << std::endl;
+void TreeSerializer::add_vertex_(TreeSerializer::SyntaxType syntax_type) {
     dot_stream_ << "{" << syntax_label_[syntax_type] << syntax_counter_[syntax_type];
     dot_stream_ << "[label=\"" << syntax_label_[syntax_type] << "\"]}";
 }
 
-void TreeSerializer::visit(const Program* program)
-{
+void TreeSerializer::visit(const Program* program) {
     if (program == nullptr) {
         return;
     }
@@ -79,8 +74,7 @@ void TreeSerializer::visit(const Program* program)
 }
 
 
-void TreeSerializer::visit(const Symbol* symbol)
-{
+void TreeSerializer::visit(const Symbol* symbol) {
     if (symbol == nullptr) {
         return;
     }
@@ -89,8 +83,8 @@ void TreeSerializer::visit(const Symbol* symbol)
 
 }
 
-void TreeSerializer::visit(const MainClass* main_class)
-{
+void TreeSerializer::visit(const MainClass* main_class) {
+
     if (main_class == nullptr) {
         return;
     }
@@ -107,8 +101,8 @@ void TreeSerializer::visit(const MainClass* main_class)
     main_class->_main_body->accept(this);
 }
 
-void TreeSerializer::visit(const ClassDeclList* class_decl_list)
-{
+void TreeSerializer::visit(const ClassDeclList* class_decl_list) {
+
     if (class_decl_list == nullptr) {
         return;
     }
@@ -124,8 +118,8 @@ void TreeSerializer::visit(const ClassDeclList* class_decl_list)
     }
 }
 
-void TreeSerializer::visit(const ClassDecl* class_decl)
-{
+void TreeSerializer::visit(const ClassDecl* class_decl) {
+
     if (class_decl == nullptr) {
         return;
     }
@@ -151,8 +145,8 @@ void TreeSerializer::visit(const ClassDecl* class_decl)
     }
 }
 
-void TreeSerializer::visit(const VarDeclList* var_decl_list)
-{
+void TreeSerializer::visit(const VarDeclList* var_decl_list) {
+
     if (var_decl_list == nullptr) {
         return;
     }
@@ -168,8 +162,8 @@ void TreeSerializer::visit(const VarDeclList* var_decl_list)
     }
 }
 
-void TreeSerializer::visit(const VarDecl* var_decl)
-{
+void TreeSerializer::visit(const VarDecl* var_decl) {
+
     if (var_decl == nullptr) {
         return;
     }
@@ -177,8 +171,8 @@ void TreeSerializer::visit(const VarDecl* var_decl)
     add_edge_(parent_, VAR_DECL);
 }
 
-void TreeSerializer::visit(const MethodDeclList* method_decl_list)
-{
+void TreeSerializer::visit(const MethodDeclList* method_decl_list) {
+
     if (method_decl_list == nullptr) {
         return;
     }
@@ -194,8 +188,8 @@ void TreeSerializer::visit(const MethodDeclList* method_decl_list)
     }
 }
 
-void TreeSerializer::visit(const MethodDecl* method_decl)
-{
+void TreeSerializer::visit(const MethodDecl* method_decl) {
+
     if (method_decl == nullptr) {
         return;
     }
@@ -225,8 +219,8 @@ void TreeSerializer::visit(const MethodDecl* method_decl)
     }
 }
 
-void TreeSerializer::visit(const ArgumentList* argument_list)
-{
+void TreeSerializer::visit(const ArgumentList* argument_list) {
+
     if (argument_list == nullptr) {
         return;
     }
@@ -242,8 +236,8 @@ void TreeSerializer::visit(const ArgumentList* argument_list)
     }
 }
 
-void TreeSerializer::visit(const StatementList* statement_list)
-{
+void TreeSerializer::visit(const StatementList* statement_list) {
+
     if (statement_list == nullptr) {
         return;
     }
@@ -261,8 +255,8 @@ void TreeSerializer::visit(const StatementList* statement_list)
 
 }
 
-void TreeSerializer::visit(const AssignSubscriptStatement* assign_subscript_statement)
-{
+void TreeSerializer::visit(const AssignSubscriptStatement* assign_subscript_statement) {
+
     if (assign_subscript_statement == nullptr) {
         return;
     }
@@ -279,8 +273,8 @@ void TreeSerializer::visit(const AssignSubscriptStatement* assign_subscript_stat
     assign_subscript_statement->subscript_->accept(this);
 }
 
-void TreeSerializer::visit(const PrintStatement* print_statement)
-{
+void TreeSerializer::visit(const PrintStatement* print_statement) {
+
     if (print_statement == nullptr) {
         return;
     }
@@ -291,8 +285,8 @@ void TreeSerializer::visit(const PrintStatement* print_statement)
     print_statement->expression_to_print_->accept(this);
 }
 
-void TreeSerializer::visit(const IfStatement* if_statement)
-{
+void TreeSerializer::visit(const IfStatement* if_statement) {
+
     if (if_statement == nullptr) {
         return;
     }
@@ -309,8 +303,8 @@ void TreeSerializer::visit(const IfStatement* if_statement)
     if_statement->statement_if_true_->accept(this);
 }
 
-void TreeSerializer::visit(const WhileStatement* while_statement)
-{
+void TreeSerializer::visit(const WhileStatement* while_statement) {
+
     if (while_statement == nullptr) {
         return;
     }
@@ -324,8 +318,8 @@ void TreeSerializer::visit(const WhileStatement* while_statement)
     while_statement->loop_condition_->accept(this);
 }
 
-void TreeSerializer::visit(const AssignStatement* assign_statement)
-{
+void TreeSerializer::visit(const AssignStatement* assign_statement) {
+
     if (assign_statement == nullptr) {
         return;
     }
@@ -339,8 +333,8 @@ void TreeSerializer::visit(const AssignStatement* assign_statement)
     assign_statement->rhs_expression_->accept(this);
 }
 
-void TreeSerializer::visit(const ExpressionList* expression_list)
-{
+void TreeSerializer::visit(const ExpressionList* expression_list) {
+
     if (expression_list == nullptr) {
         return;
     }
@@ -356,8 +350,8 @@ void TreeSerializer::visit(const ExpressionList* expression_list)
     }
 }
 
-void TreeSerializer::visit(const LengthExpression* length_expression)
-{
+void TreeSerializer::visit(const LengthExpression* length_expression) {
+
     if (length_expression == nullptr) {
         return;
     }
@@ -368,8 +362,8 @@ void TreeSerializer::visit(const LengthExpression* length_expression)
     length_expression->expression_->accept(this);
 }
 
-void TreeSerializer::visit(const IdExpression* id_expression)
-{
+void TreeSerializer::visit(const IdExpression* id_expression) {
+
     if (id_expression == nullptr) {
         return;
     }
@@ -380,8 +374,8 @@ void TreeSerializer::visit(const IdExpression* id_expression)
     id_expression->id_->accept(this);
 }
 
-void TreeSerializer::visit(const ThisExpression* this_expression)
-{
+void TreeSerializer::visit(const ThisExpression* this_expression) {
+
     if (this_expression == nullptr) {
         return;
     }
@@ -389,8 +383,8 @@ void TreeSerializer::visit(const ThisExpression* this_expression)
     add_edge_(parent_, THIS_EXPRESSION);
 }
 
-void TreeSerializer::visit(const IntExpression* int_expression)
-{
+void TreeSerializer::visit(const IntExpression* int_expression) {
+
     if (int_expression == nullptr) {
         return;
     }
@@ -398,11 +392,12 @@ void TreeSerializer::visit(const IntExpression* int_expression)
     add_edge_(parent_, INT_EXPRESSION);
 
     parent_ = INT_EXPRESSION;
-    int_expression->literal_id_->accept(this);
+    
+    add_edge_(parent_, INTEGER);
 }
 
-void TreeSerializer::visit(const BoolExpression* bool_expression)
-{
+void TreeSerializer::visit(const BoolExpression* bool_expression) {
+
     if (bool_expression == nullptr) {
         return;
     }
@@ -410,8 +405,8 @@ void TreeSerializer::visit(const BoolExpression* bool_expression)
     add_edge_(parent_, BOOL_EXPRESSION);
 }
 
-void TreeSerializer::visit(const MethodCallExpression* method_call_expression)
-{
+void TreeSerializer::visit(const MethodCallExpression* method_call_expression) {
+
     if (method_call_expression == nullptr) {
         return;
     }
@@ -430,8 +425,8 @@ void TreeSerializer::visit(const MethodCallExpression* method_call_expression)
     }
 }
 
-void TreeSerializer::visit(const SubscriptExpression* subscript_expression)
-{
+void TreeSerializer::visit(const SubscriptExpression* subscript_expression) {
+
     if (subscript_expression == nullptr) {
         return;
     }
@@ -445,8 +440,8 @@ void TreeSerializer::visit(const SubscriptExpression* subscript_expression)
     subscript_expression->subscript_->accept(this);
 }
 
-void TreeSerializer::visit(const NewIntArrayExpression* new_array_expression)
-{
+void TreeSerializer::visit(const NewIntArrayExpression* new_array_expression) {
+
     if (new_array_expression == nullptr) {
         return;
     }
@@ -457,8 +452,8 @@ void TreeSerializer::visit(const NewIntArrayExpression* new_array_expression)
     new_array_expression->subscript_expression_->accept(this);
 }
 
-void TreeSerializer::visit(const NewObjectExpression* new_object_expression)
-{
+void TreeSerializer::visit(const NewObjectExpression* new_object_expression) {
+
     if (new_object_expression == nullptr) {
         return;
     }
@@ -469,8 +464,8 @@ void TreeSerializer::visit(const NewObjectExpression* new_object_expression)
     new_object_expression->new_object_type_->accept(this);
 }
 
-void TreeSerializer::visit(const BinaryExpression* binary_expression)
-{
+void TreeSerializer::visit(const BinaryExpression* binary_expression) {
+
     if (binary_expression == nullptr) {
         return;
     }
@@ -484,8 +479,8 @@ void TreeSerializer::visit(const BinaryExpression* binary_expression)
     binary_expression->rhs_expression_->accept(this);
 }
 
-void TreeSerializer::visit(const NegationExpression* negation_expression)
-{
+void TreeSerializer::visit(const NegationExpression* negation_expression) {
+
     if (negation_expression == nullptr) {
         return;
     }
@@ -496,8 +491,8 @@ void TreeSerializer::visit(const NegationExpression* negation_expression)
     negation_expression->expression_to_negate_->accept(this);
 }
 
-void TreeSerializer::visit(const UnaryMinusExpression* unary_minus_expression)
-{
+void TreeSerializer::visit(const UnaryMinusExpression* unary_minus_expression) {
+    
     if (unary_minus_expression == nullptr) {
         return;
     }

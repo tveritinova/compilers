@@ -12,7 +12,7 @@
       std::cerr << "ERROR: " << str << std::endl;
   }
 
-  TreeSerializer *pp = new TreeSerializer();
+  TreeSerializer *ts = new TreeSerializer("./SyntaxTree.gv");
 %}
 
 %locations
@@ -105,6 +105,7 @@
 %type   <statement_list>    stmnt_list
 %type   <statement>         statement
 %type   <expression_list>   expression_list
+%type   <expression_list>   expression_add
 
 %type   <expression>        expression
 %type   <id>                extends_block
@@ -123,11 +124,11 @@
 %%
 
 
-goal : { printf("empty\n"); }
+goal :
 
-    | main_class 
+      main_class class_dec_list
 
-        { printf("goal\n"); /*$$ = new Program($1, $2);*/ }
+        { $$ = new Program($1, $2); $$->accept(ts); }
 ;
 
 
@@ -138,18 +139,24 @@ main_class :
         BTBR_L statement BTBR_R
       BTBR_R
 
-        { printf("main class\n"); }
+        { $$ = new MainClass($2, $10, $13); }
 ;
 
 
 class_dec :
 
-      CLASS id extends_block BTBR_R
+      CLASS id extends_block BTBR_L
         var_dec_list 
         method_list
       BTBR_R
 
         { $$ = new ClassDecl($2, $3, $5, $6); }
+
+    | CLASS id extends_block BTBR_L
+        method_list
+      BTBR_R
+
+        { $$ = new ClassDecl($2, $3, nullptr, $5); }
 ;
 
 
@@ -159,7 +166,7 @@ class_dec_list :
 
         { $$ = new ClassDeclList($2, $1); }
 
-    |   { printf("empty class dec\n"); $$ = nullptr; }
+    |   { $$ = nullptr; }
 ;
 
 
@@ -169,7 +176,7 @@ extends_block :
 
         { $$ = $2; }
 
-    |   { printf("empty extends block\n"); $$ = nullptr; }
+    |   { $$ = nullptr; }
 ;
 
 
@@ -203,6 +210,32 @@ method :
       BTBR_R
 
         { $$ = new MethodDecl($2, $3, $5, $8, $9, $11); }
+
+    | PUBLIC type id 
+      RNDBR_L arglist RNDBR_R 
+      BTBR_L 
+        stmnt_list 
+        RETURN expression SEMICOLON 
+      BTBR_R
+
+        { $$ = new MethodDecl($2, $3, $5, nullptr, $8, $10); }
+
+    | PUBLIC type id 
+      RNDBR_L arglist RNDBR_R 
+      BTBR_L 
+        var_dec_list 
+        RETURN expression SEMICOLON 
+      BTBR_R
+
+        { $$ = new MethodDecl($2, $3, $5, $8, nullptr, $10); }
+
+    | PUBLIC type id 
+      RNDBR_L arglist RNDBR_R 
+      BTBR_L 
+        RETURN expression SEMICOLON 
+      BTBR_R
+
+        { $$ = new MethodDecl($2, $3, $5, nullptr, nullptr, $9); }
 ;
 
 
@@ -212,7 +245,7 @@ method_list:
       
         { $$ = new MethodDeclList($2, $1); }
     
-    |   { printf("empty method decl\n"); $$ = nullptr; }
+    |   { $$ = nullptr; }
 ;
 
 
@@ -238,7 +271,8 @@ stmnt_list:
 
     | statement  
 
-        { $$ = new StatementList($1, nullptr); };
+        { $$ = new StatementList($1, nullptr);; }
+;
 
 
 type:
@@ -277,7 +311,7 @@ statement :
 
 		| PRINT RNDBR_L expression RNDBR_R SEMICOLON 	
 
-        { printf("println\n"); $$ = new PrintStatement($3); }
+        { $$ = new PrintStatement($3); }
 
   	| id EQ expression SEMICOLON 	
 
@@ -329,7 +363,7 @@ expression :
 
 		| TRUE 	
 
-        { printf("true\n"); $$ = new BoolExpression(true); }
+        { $$ = new BoolExpression(true); }
 
 		| FALSE 
 
@@ -362,28 +396,36 @@ expression :
 
 
 expression_list:
-
-      expression_list COMMA expression  
-      
-        { printf("expression list\n"); $$ = new ExpressionList($3, $1); }
     
-    | expression
+      expression expression_add
 
-        { printf("expression\n"); $$ = new ExpressionList($1, nullptr); }
+        { $$ = new ExpressionList($1, $2); }
+
+    |   { $$ = nullptr;}
 ;
 
+expression_add:
+
+      expression_add COMMA expression
+
+        { $$ = new ExpressionList($3, $1); }
+
+    |   { $$ = nullptr;}
+;
 
 id : 
 
       ID 
 
-        { printf("id %s\n", yyval.strValue); $$ = new Symbol(yyval.strValue);} 
+        { $$ = new Symbol(yyval.strValue);}
 ;
 
 %%
 
 
 int main(void) {
+    //extern int yydebug;
+    //yydebug = 1;
     yyparse();
-    delete pp;
+    delete ts;
 }
