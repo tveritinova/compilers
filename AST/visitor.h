@@ -1,14 +1,14 @@
-#ifndef TREESERIALIZER_H
-#define TREESERIALIZER_H
+#ifndef VISITOR_H
+#define VISITOR_H
 
 #include "grammar_declaration.h"
 
 struct Visitor
 {
-    virtual ~Visitor() = default;
+    virtual ~Visitor() {};
 
-    virtual void visit(const Program*) = 0;
     virtual void visit(const Symbol*) = 0;
+    virtual void visit(const Program*) = 0;
 
     virtual void visit(const MainClass*) = 0;
     virtual void visit(const ClassDeclList*) = 0;
@@ -48,4 +48,4 @@ struct Visitable
     virtual void accept(Visitor* visitor) const = 0;
 };
 
-#endif
+#endif//VISITOR_H

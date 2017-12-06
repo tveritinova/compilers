@@ -2,27 +2,11 @@
 #ifndef GRAMMAR_H
 #define GRAMMAR_H
 
-#include "AST/visitor.h"
-#include "AST/grammar_declaration.h"
+//#include "grammar_declaration.h"
+#include "visitor.h"
+#include "../SymbolTable/Symbol.h"
 #include <vector>
 #include <string>
-
-class Symbol : public Visitable {
-
-public:
-
-    Symbol(std::string str) : str_(std::move(str)) {}
-
-    const std::string& to_string() const {
-        return str_;
-    }
-
-    virtual void accept(Visitor* visitor) const override {
-        visitor->visit(this);
-    }
-
-    std::string str_;
-};
 
 
 class Program : public Visitable {
@@ -39,7 +23,6 @@ public:
     const MainClass* _main_class;
     const ClassDeclList* _classes;
 };
-
 
 class MainClass: public Visitable {
 

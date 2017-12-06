@@ -1,3 +1,6 @@
+#ifndef TREESERIALIZER_H
+#define TREESERIALIZER_H
+
 
 #include <string>
 #include <array>
@@ -6,6 +9,7 @@
 
 #include "visitor.h"
 #include "grammar_declaration.h"
+#include "../SymbolTable/Symbol.h"
 
 class TreeSerializer : public Visitor
 {
@@ -96,3 +100,4 @@ private:
     void add_vertex_(SyntaxType syntax_type);
 };
 
+#endif //TREESERIALIZER_H

@@ -2,8 +2,8 @@
 %{
 	#include <stdio.h>
     #include <stdlib.h>
-    #include "grammar_declaration.h"
-    #include "visitor.h"
+    #include "AST/grammar_declaration.h"
+    #include "AST/visitor.h"
     #include "tokens.h"
 
     void preaction(const char* yytext);

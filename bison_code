@@ -2,17 +2,22 @@
 %{
   #include <iostream>
   #include <string>
-  #include "grammar.h"
-  #include "treeserializer.h"
+  #include "AST/grammar.h"
+  #include "AST/expression.h"
+  #include "AST/statement.h"
+  #include "AST/type.h"
+  #include "AST/treeserializer.h"
 
   extern "C" int yylex();
+  //extern int yyparse();
 
   void yyerror(const char* str)
   {
       std::cerr << "ERROR: " << str << std::endl;
   }
 
-  TreeSerializer *ts = new TreeSerializer("./SyntaxTree.gv");
+  Program* program;
+
 %}
 
 %locations
@@ -128,7 +133,7 @@ goal :
 
       main_class class_dec_list
 
-        { $$ = new Program($1, $2); $$->accept(ts); }
+        { $$ = new Program($1, $2); }
 ;
 
 
@@ -421,11 +426,3 @@ id :
 ;
 
 %%
-
-
-int main(void) {
-    //extern int yydebug;
-    //yydebug = 1;
-    yyparse();
-    delete ts;
-}

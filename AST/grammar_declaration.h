@@ -1,8 +1,6 @@
-#ifndef MINIJAVAC_GRAMMAR_DEF_H
-#define MINIJAVAC_GRAMMAR_DEF_H
 
-class Program;
 class Symbol;
+class Program;
 
 class MainClass;
 class ClassDeclList;
@@ -41,5 +39,3 @@ class UnaryMinusExpression;
 class Type;
 class BasicType;
 class ClassType;
-
-#endif //MINIJAVAC_GRAMMAR_DEF_H

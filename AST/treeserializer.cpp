@@ -1,4 +1,7 @@
 #include "grammar.h"
+#include "expression.h"
+#include "statement.h"
+#include "type.h"
 #include "treeserializer.h"
 #include <iostream>
 
@@ -75,6 +78,7 @@ void TreeSerializer::visit(const Program* program) {
 
 
 void TreeSerializer::visit(const Symbol* symbol) {
+    
     if (symbol == nullptr) {
         return;
     }
