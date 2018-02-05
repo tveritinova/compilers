@@ -2,12 +2,12 @@
 #define VISITOR_H
 
 #include "grammar_declaration.h"
+#include "../SymbolTable/Position.h"
 
-struct Visitor
-{
+struct Visitor {
     virtual ~Visitor() {};
 
-    virtual void visit(const Symbol*) = 0;
+    virtual void visit(const SymbolTable::Symbol*) = 0;
     virtual void visit(const Program*) = 0;
 
     virtual void visit(const MainClass*) = 0;
@@ -38,7 +38,6 @@ struct Visitor
     virtual void visit(const NewObjectExpression*) = 0;
     virtual void visit(const BinaryExpression*) = 0;
     virtual void visit(const NegationExpression*) = 0;
-    virtual void visit(const UnaryMinusExpression*) = 0;
 };
 
 struct Visitable
@@ -46,6 +45,8 @@ struct Visitable
     virtual ~Visitable() = default;
 
     virtual void accept(Visitor* visitor) const = 0;
+
+    Position pos;
 };
 
 #endif//VISITOR_H

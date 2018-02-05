@@ -4,7 +4,7 @@
     #include <stdlib.h>
     #include "AST/grammar_declaration.h"
     #include "AST/visitor.h"
-    #include "tokens.h"
+    #include "bison_code.tab.h"
 
     void preaction(const char* yytext);
     #define YY_USER_ACTION preaction(yytext);
@@ -13,6 +13,7 @@
     int columnNumber = 1;
 
     void preaction(const char* yytext) {
+
         yylloc.first_line = yylloc.last_line = lineNumber;
         yylloc.first_column = columnNumber;
 
@@ -25,6 +26,7 @@
             }
         }
 
+        yylloc.last_line = lineNumber;
         yylloc.last_column = columnNumber;
     }
 

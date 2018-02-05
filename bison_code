@@ -9,7 +9,6 @@
   #include "AST/treeserializer.h"
 
   extern "C" int yylex();
-  //extern int yyparse();
 
   void yyerror(const char* str)
   {
@@ -76,7 +75,7 @@
 
 
 %union {
-    Symbol* symbol;
+    SymbolTable::Symbol* symbol;
     int intval;
     char* strValue;
     Program* program;
@@ -93,7 +92,7 @@
     Statement* statement;
     ExpressionList* expression_list;
     Expression* expression;
-    Symbol* id;
+    SymbolTable::Symbol* id;
 }
 
 %type   <id>                id;
@@ -133,7 +132,7 @@ goal :
 
       main_class class_dec_list
 
-        { $$ = new Program($1, $2); }
+        { $$ = new Program($1, $2); program = $$; }
 ;
 
 
@@ -144,7 +143,7 @@ main_class :
         BTBR_L statement BTBR_R
       BTBR_R
 
-        { $$ = new MainClass($2, $10, $13); }
+        { $$ = new MainClass($2, $10, $13, Position(@1.first_line, @1.first_column)); }
 ;
 
 
@@ -155,13 +154,13 @@ class_dec :
         method_list
       BTBR_R
 
-        { $$ = new ClassDecl($2, $3, $5, $6); }
+        { $$ = new ClassDecl($2, $3, $5, $6, Position(@1.first_line, @1.first_column)); }
 
     | CLASS id extends_block BTBR_L
         method_list
       BTBR_R
 
-        { $$ = new ClassDecl($2, $3, nullptr, $5); }
+        { $$ = new ClassDecl($2, $3, nullptr, $5, Position(@1.first_line, @1.first_column)); }
 ;
 
 
@@ -189,7 +188,7 @@ var_dec:
 
       type id SEMICOLON
 
-        { $$ = new VarDecl($1, $2); }
+        { $$ = new VarDecl($1, $2, Position(@1.first_line, @1.first_column)); }
 ;
 
 
@@ -214,7 +213,7 @@ method :
         RETURN expression SEMICOLON 
       BTBR_R
 
-        { $$ = new MethodDecl($2, $3, $5, $8, $9, $11); }
+        { $$ = new MethodDecl($2, $3, $5, $8, $9, $11, Position(@1.first_line, @1.first_column)); }
 
     | PUBLIC type id 
       RNDBR_L arglist RNDBR_R 
@@ -223,7 +222,7 @@ method :
         RETURN expression SEMICOLON 
       BTBR_R
 
-        { $$ = new MethodDecl($2, $3, $5, nullptr, $8, $10); }
+        { $$ = new MethodDecl($2, $3, $5, nullptr, $8, $10, Position(@1.first_line, @1.first_column)); }
 
     | PUBLIC type id 
       RNDBR_L arglist RNDBR_R 
@@ -232,7 +231,7 @@ method :
         RETURN expression SEMICOLON 
       BTBR_R
 
-        { $$ = new MethodDecl($2, $3, $5, $8, nullptr, $10); }
+        { $$ = new MethodDecl($2, $3, $5, $8, nullptr, $10, Position(@1.first_line, @1.first_column)); }
 
     | PUBLIC type id 
       RNDBR_L arglist RNDBR_R 
@@ -240,7 +239,7 @@ method :
         RETURN expression SEMICOLON 
       BTBR_R
 
-        { $$ = new MethodDecl($2, $3, $5, nullptr, nullptr, $9); }
+        { $$ = new MethodDecl($2, $3, $5, nullptr, nullptr, $9, Position(@1.first_line, @1.first_column)); }
 ;
 
 
@@ -258,11 +257,11 @@ arglist:
 
       arglist COMMA type id 
 
-        { $$ = new ArgumentList($3, $4, $1); }
+        { $$ = new ArgumentList($3, $4, $1, Position(@1.first_line, @1.first_column)); }
 
     | type id
 
-        { $$ = new ArgumentList($1, $2, nullptr); }
+        { $$ = new ArgumentList($1, $2, nullptr, Position(@1.first_line, @1.first_column)); }
 
     |   { $$ = nullptr; }
 ; 
@@ -296,7 +295,9 @@ type:
 
     | id
 
-        { $$ = new ClassType((Symbol *)($1)); }
+        { $$ = new ClassType((SymbolTable::
+
+        Symbol *)($1)); }
 ;
 
 
@@ -308,23 +309,23 @@ statement :
 
   	| IF RNDBR_L expression RNDBR_R statement ELSE statement  
 
-        { $$ = new IfStatement($3, $5, $7); }
+        { $$ = new IfStatement($3, $5, $7, Position(@1.first_line, @1.first_column)); }
 
   	| WHILE RNDBR_L expression RNDBR_R statement 	
 
-        { $$ = new WhileStatement($3, $5); }
+        { $$ = new WhileStatement($3, $5, Position(@1.first_line, @1.first_column)); }
 
 		| PRINT RNDBR_L expression RNDBR_R SEMICOLON 	
 
-        { $$ = new PrintStatement($3); }
+        { $$ = new PrintStatement($3, Position(@1.first_line, @1.first_column)); }
 
   	| id EQ expression SEMICOLON 	
 
-        { $$ = new AssignStatement($1, $3); }
+        { $$ = new AssignStatement($1, $3, Position(@1.first_line, @1.first_column)); }
 
   	| id SQBR_L expression SQBR_R EQ expression SEMICOLON 	
 
-        { $$ = new AssignSubscriptStatement($1, $3, $6); }
+        { $$ = new AssignSubscriptStatement($1, $3, $6, Position(@1.first_line, @1.first_column)); }
 ;
 
 
@@ -332,51 +333,51 @@ expression :
 
       expression AND expression 		
 
-        { $$ = new BinaryExpression($1, BinaryOperator::AND_, $3); }
+        { $$ = new BinaryExpression($1, BinaryOperator::AND_, $3, Position(@1.first_line, @1.first_column)); }
 
     | expression LESS expression 		
 
-        { $$ = new BinaryExpression($1, BinaryOperator::LESS_, $3); }
+        { $$ = new BinaryExpression($1, BinaryOperator::LESS_, $3, Position(@1.first_line, @1.first_column)); }
 
 		| expression PLUS expression 		
 
-        { $$ = new BinaryExpression($1, BinaryOperator::ADD_, $3); }
+        { $$ = new BinaryExpression($1, BinaryOperator::ADD_, $3, Position(@1.first_line, @1.first_column)); }
 
 		| expression MINUS expression 	
 
-        { $$ = new BinaryExpression($1, BinaryOperator::SUB_, $3); }
+        { $$ = new BinaryExpression($1, BinaryOperator::SUB_, $3, Position(@1.first_line, @1.first_column)); }
 
     | expression STAR expression  	
 
-        { $$ = new BinaryExpression($1, BinaryOperator::MUL_, $3); }
+        { $$ = new BinaryExpression($1, BinaryOperator::MUL_, $3, Position(@1.first_line, @1.first_column)); }
 
 		| expression SQBR_L expression SQBR_R		
 
-        { $$ = new SubscriptExpression($1, $3); }
+        { $$ = new SubscriptExpression($1, $3, Position(@1.first_line, @1.first_column)); }
 
 		| expression DOT LEN	
 
-        { $$ = new LengthExpression($1); }
+        { $$ = new LengthExpression($1, Position(@1.first_line, @1.first_column)); }
 
 		| expression DOT id RNDBR_L expression_list RNDBR_R 	
 
-        { $$ = new MethodCallExpression($1, $3, $5); }
+        { $$ = new MethodCallExpression($1, $3, $5, Position(@1.first_line, @1.first_column)); }
 
 		| NUM  	
 
-        { $$ = new IntExpression(yylval.intval); }
+        { $$ = new IntExpression(yylval.intval, Position(@1.first_line, @1.first_column)); }
 
 		| TRUE 	
 
-        { $$ = new BoolExpression(true); }
+        { $$ = new BoolExpression(true, Position(@1.first_line, @1.first_column)); }
 
 		| FALSE 
 
-        { $$ = new BoolExpression(false); }
+        { $$ = new BoolExpression(false, Position(@1.first_line, @1.first_column)); }
 
 		| id 
 
-        { $$ = new IdExpression($1); }
+        { $$ = new IdExpression($1, Position(@1.first_line, @1.first_column)); }
 
 		| THIS 
 
@@ -384,15 +385,15 @@ expression :
 
 		| NEW INT SQBR_L expression SQBR_R 
 
-        { $$ = new NewIntArrayExpression($4); }
+        { $$ = new NewIntArrayExpression($4, Position(@1.first_line, @1.first_column)); }
 
 		| NEW id RNDBR_L RNDBR_R 
 
-        { $$ = new NewObjectExpression($2); }
+        { $$ = new NewObjectExpression($2, Position(@1.first_line, @1.first_column)); }
 
 		| EXCL expression 
 
-        { $$ = new NegationExpression($2); }
+        { $$ = new NegationExpression($2, Position(@1.first_line, @1.first_column)); }
 
 		| RNDBR_L expression RNDBR_R 
 
@@ -422,7 +423,7 @@ id :
 
       ID 
 
-        { $$ = new Symbol(yyval.strValue);}
+        { $$ = SymbolTable::Symbol::GetIntern(yyval.strValue);}
 ;
 
 %%

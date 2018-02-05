@@ -1,5 +1,7 @@
+namespace SymbolTable {
+	class Symbol;
+}
 
-class Symbol;
 class Program;
 
 class MainClass;
@@ -34,7 +36,6 @@ class NewIntArrayExpression;
 class NewObjectExpression;
 class BinaryExpression;
 class NegationExpression;
-class UnaryMinusExpression;
 
 class Type;
 class BasicType;

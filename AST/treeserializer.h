@@ -11,8 +11,7 @@
 #include "grammar_declaration.h"
 #include "../SymbolTable/Symbol.h"
 
-class TreeSerializer : public Visitor
-{
+class TreeSerializer: public Visitor {
 public:
     TreeSerializer(std::string path);
     ~TreeSerializer();
@@ -20,7 +19,7 @@ public:
     //std::string ast_tree_to_dot(const Program* program);
 
     void visit(const Program*) override;
-    void visit(const Symbol*) override;
+    void visit(const SymbolTable::Symbol*) override;
 
     void visit(const MainClass*) override;
     void visit(const ClassDeclList*) override;
@@ -50,7 +49,6 @@ public:
     void visit(const NewObjectExpression*) override;
     void visit(const BinaryExpression*) override;
     void visit(const NegationExpression*) override;
-    void visit(const UnaryMinusExpression*) override;
 
 private:
     enum SyntaxType
@@ -86,10 +84,9 @@ private:
         NEW_OBJECT_EXPRESSION,
         BINARY_EXPRESSION,
         NEGATION_EXPRESSION,
-        UNARY_MINUS_EXPRESSION
     };
 
-    static const std::size_t NUM_SYNTAX_TYPES = UNARY_MINUS_EXPRESSION + 1;
+    static const std::size_t NUM_SYNTAX_TYPES = NEGATION_EXPRESSION + 1;
 
     std::ofstream dot_stream_;
     SyntaxType parent_;

@@ -2,12 +2,11 @@
 #ifndef GRAMMAR_H
 #define GRAMMAR_H
 
-//#include "grammar_declaration.h"
+#include "grammar_declaration.h"
 #include "visitor.h"
 #include "../SymbolTable/Symbol.h"
 #include <vector>
 #include <string>
-
 
 class Program : public Visitable {
 
@@ -28,15 +27,15 @@ class MainClass: public Visitable {
 
 public:
 
-    MainClass(const Symbol* class_id, const Symbol* main_argv_id, const Statement* main_body)
-        : _class_id(class_id), _main_argv_id(main_argv_id), _main_body(main_body) {}  
+    MainClass(const SymbolTable::Symbol* class_id, const SymbolTable::Symbol* main_argv_id, const Statement* main_body, Position _pos)
+        : _class_id(class_id), _main_argv_id(main_argv_id), _main_body(main_body) { pos = _pos; }  
 
     virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
     }
 
-    const Symbol* _class_id;
-    const Symbol* _main_argv_id;
+    const SymbolTable::Symbol* _class_id;
+    const SymbolTable::Symbol* _main_argv_id;
     const Statement* _main_body;
 };
 
@@ -44,16 +43,18 @@ class ClassDecl: public Visitable {
 
 public:
 
-    ClassDecl(const Symbol* class_id, const Symbol* base_class_id,
-        const VarDeclList* variables, const MethodDeclList* methods)
-        : _class_id(class_id), _base_class_id(base_class_id), _vars(variables), _methods(methods) {}
+    ClassDecl(const SymbolTable::Symbol* class_id, const SymbolTable::Symbol* base_class_id,
+        const VarDeclList* variables, const MethodDeclList* methods, Position _pos)
+        : _class_id(class_id), _base_class_id(base_class_id), _vars(variables), _methods(methods) { 
+            pos = _pos;
+        }
 
     virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
     }
 
-    const Symbol* _class_id;
-    const Symbol* _base_class_id;
+    const SymbolTable::Symbol* _class_id;
+    const SymbolTable::Symbol* _base_class_id;
     const VarDeclList* _vars;
     const MethodDeclList* _methods;
 };
@@ -77,15 +78,15 @@ public:
 class VarDecl: public Visitable {
 
 public:
-    VarDecl(const Type* type, const Symbol* var_id)
-        : _type(type), _var_id(var_id) {}
+    VarDecl(const Type* type, const SymbolTable::Symbol* var_id, Position _pos)
+        : _type(type), _var_id(var_id) { pos = _pos; }
 
     virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
     }
 
     const Type* _type;
-    const Symbol* _var_id;
+    const SymbolTable::Symbol* _var_id;
 };
 
 class VarDeclList: public Visitable {
@@ -122,17 +123,20 @@ class MethodDecl: public Visitable {
 
 public:
 
-    MethodDecl(const Type* return_type, const Symbol* method_id, const ArgumentList* arg_list,
-        const VarDeclList* var_decls, const StatementList* statements, const Expression* return_expression)
+    MethodDecl(const Type* return_type, const SymbolTable::Symbol* method_id, const ArgumentList* arg_list,
+        const VarDeclList* var_decls, const StatementList* statements, const Expression* return_expression,
+        Position _pos)
         : return_type_(return_type), method_id_(method_id), arg_list_(arg_list),
-          var_decls_(var_decls), statements_(statements), return_expression_(return_expression) {}
+          var_decls_(var_decls), statements_(statements), return_expression_(return_expression) {
+            pos = _pos;
+          }
     
     virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
     }
 
     const Type* return_type_;
-    const Symbol* method_id_;
+    const SymbolTable::Symbol* method_id_;
     const ArgumentList* arg_list_;
     const VarDeclList* var_decls_;
     const StatementList* statements_;
@@ -143,15 +147,15 @@ class ArgumentList: public Visitable {
 
 public:
 
-    ArgumentList(const Type* arg_type, const Symbol* arg_id, const ArgumentList* other_args)
-        : arg_type_(arg_type), arg_id_(arg_id), other_args_(other_args) {}
+    ArgumentList(const Type* arg_type, const SymbolTable::Symbol* arg_id, const ArgumentList* other_args, Position _pos)
+        : arg_type_(arg_type), arg_id_(arg_id), other_args_(other_args) { pos = _pos; }
 
     virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
     }
 
     const Type* arg_type_;
-    const Symbol* arg_id_;
+    const SymbolTable::Symbol* arg_id_;
     const ArgumentList* other_args_;
 };
 

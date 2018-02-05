@@ -1,4 +1,7 @@
 
+#ifndef H_EXPRESSION
+#define H_EXPRESSION
+
 class ExpressionList : public Visitable {
 
 public:
@@ -17,7 +20,7 @@ public:
 class Expression : public Visitable {};
 
 enum class BinaryOperator {
-    ADD_, SUB_, MUL_, DIV_, MOD_, AND_, OR_, LESS_
+    ADD_, SUB_, MUL_, DIV_, AND_, LESS_
 };
 
 class BinaryExpression : public Expression {
@@ -25,10 +28,10 @@ class BinaryExpression : public Expression {
 public:
     
     BinaryExpression(const Expression* lhs_expression, BinaryOperator binary_operator,
-        const Expression* rhs_expression)
+        const Expression* rhs_expression, Position pos)
         : lhs_expression_(lhs_expression), 
         binary_operator_(binary_operator), 
-        rhs_expression_(rhs_expression) {}
+        rhs_expression_(rhs_expression) { this->pos = pos; }
 
     virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
@@ -43,8 +46,8 @@ class SubscriptExpression : public Expression {
 
 public:
     
-    SubscriptExpression(const Expression* expression, const Expression* subscript)
-        : expression_(expression), subscript_(subscript) {}
+    SubscriptExpression(const Expression* expression, const Expression* subscript, Position pos)
+        : expression_(expression), subscript_(subscript) { this->pos = pos; }
 
     virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
@@ -58,7 +61,7 @@ class LengthExpression : public Expression {
 
 public:
     
-    LengthExpression(const Expression* expression) : expression_(expression) {}
+    LengthExpression(const Expression* expression, Position pos) : expression_(expression) { this->pos = pos; }
 
     virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
@@ -71,18 +74,18 @@ class MethodCallExpression : public Expression {
 
 public:
 
-    MethodCallExpression(const Expression* expression, const Symbol* method_id,
-        const ExpressionList* other_expressions)
+    MethodCallExpression(const Expression* expression, const SymbolTable::Symbol* method_id,
+        const ExpressionList* other_expressions, Position pos)
         : expression_(expression), 
         method_id_(method_id), 
-        other_expressions_(other_expressions) {}
+        other_expressions_(other_expressions) { this->pos = pos; }
 
     virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
     }
 
     const Expression* expression_;
-    const Symbol* method_id_;
+    const SymbolTable::Symbol* method_id_;
     const ExpressionList* other_expressions_;
 };
 
@@ -90,7 +93,7 @@ class IntExpression : public Expression {
 
 public:
     
-    IntExpression(int val_) : val(val_) {}
+    IntExpression(int val_, Position pos) : val(val_) { this->pos = pos; }
 
     virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
@@ -103,7 +106,7 @@ class BoolExpression : public Expression {
 
 public:
     
-    BoolExpression(bool b) : b_(b) {}
+    BoolExpression(bool b, Position pos) : b_(b) { this->pos = pos; }
 
     virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
@@ -116,13 +119,13 @@ class IdExpression : public Expression {
 
 public:
     
-    IdExpression(const Symbol* id) : id_(id) {}
+    IdExpression(const SymbolTable::Symbol* id, Position pos) : id_(id) { this->pos = pos; }
 
     virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
     }
 
-    const Symbol* id_;
+    const SymbolTable::Symbol* id_;
 };
 
 class ThisExpression : public Expression {
@@ -138,8 +141,8 @@ class NewIntArrayExpression : public Expression {
 
 public:
     
-    NewIntArrayExpression(const Expression* subscript_expression)
-        : subscript_expression_(subscript_expression) {}
+    NewIntArrayExpression(const Expression* subscript_expression, Position pos)
+        : subscript_expression_(subscript_expression) { this->pos = pos; }
 
     virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
@@ -152,20 +155,22 @@ class NewObjectExpression : public Expression {
 
 public:
     
-    NewObjectExpression(Symbol* type) : new_object_type_(type) {}
+    NewObjectExpression(SymbolTable::Symbol* type, Position pos) : new_object_type_(type) { 
+        this->pos = pos; 
+    }
 
     virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
     }
 
-    Symbol* new_object_type_;
+    SymbolTable::Symbol* new_object_type_;
 };
 
 class NegationExpression : public Expression {
 
 public:
     
-    NegationExpression(const Expression* expression) : expression_to_negate_(expression) {}
+    NegationExpression(const Expression* expression, Position pos) : expression_to_negate_(expression) { this->pos = pos; }
 
     virtual void accept(Visitor* visitor) const override {
         visitor->visit(this);
@@ -174,15 +179,4 @@ public:
     const Expression* expression_to_negate_;
 };
 
-class UnaryMinusExpression : public Expression {
-
-public:
-    
-    UnaryMinusExpression(const Expression* expression) : expression_(expression) {}
-
-    virtual void accept(Visitor* visitor) const override {
-        visitor->visit(this);
-    }
-
-    const Expression* expression_;
-};
+#endif

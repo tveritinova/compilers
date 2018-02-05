@@ -1,7 +1,10 @@
+
+#include "../SymbolTable/Symbol.h"
+
 class Type {
     
 public:
-    std::string label;
+    SymbolTable::Symbol* id;
 };
 
 enum BasicTypes {
@@ -14,9 +17,9 @@ class BasicType: public Type {
 public:
 
     BasicType(BasicTypes type_): type(type_){
-        if (type == INT_) label = "int";
-        if (type == BOOL_) label = "bool";
-        if (type == INT_ARRAY_) label = "int[]";
+        if (type == INT_) id = SymbolTable::Symbol::GetIntern("int");
+        if (type == BOOL_) id = SymbolTable::Symbol::GetIntern("boolean");
+        if (type == INT_ARRAY_) id = SymbolTable::Symbol::GetIntern("int[]");
     }
 
     BasicTypes type;
@@ -25,11 +28,7 @@ public:
 class ClassType: public Type {
 
 public:
-    ClassType(Symbol * id_): id(id_) {
-
-        label = id->String();
-    
+    ClassType(SymbolTable::Symbol * id_) {
+        id = id_;
     }
-    
-    Symbol* id;
 };

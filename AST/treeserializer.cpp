@@ -37,7 +37,6 @@ TreeSerializer::TreeSerializer(std::string path)
     syntax_label_[NEW_OBJECT_EXPRESSION] = "NewObjectExpression";
     syntax_label_[BINARY_EXPRESSION] = "BinaryExpression";
     syntax_label_[NEGATION_EXPRESSION] = "NegationExpression";
-    syntax_label_[UNARY_MINUS_EXPRESSION] = "UnaryMinusExpression";
 
     dot_stream_.open(path);
     dot_stream_ << "digraph g {\n" << "\n";
@@ -77,14 +76,20 @@ void TreeSerializer::visit(const Program* program) {
 }
 
 
-void TreeSerializer::visit(const Symbol* symbol) {
+void TreeSerializer::visit(const SymbolTable::Symbol* symbol) {
     
     if (symbol == nullptr) {
         return;
     }
 
     add_edge_(parent_, SYMBOL);
-
+    dot_stream_ << "\t";
+    dot_stream_ << "{" << syntax_label_[SYMBOL] << syntax_counter_[SYMBOL];
+    dot_stream_ << "[label=\"" << syntax_label_[SYMBOL] << "\"]}";
+    dot_stream_ << "->";
+    dot_stream_ << "{" << syntax_label_[SYMBOL] << syntax_counter_[SYMBOL] << "val";
+    dot_stream_ << "[label=\"" << symbol->String() << "\"]}";
+    dot_stream_ << ";\n";
 }
 
 void TreeSerializer::visit(const MainClass* main_class) {
@@ -243,6 +248,7 @@ void TreeSerializer::visit(const ArgumentList* argument_list) {
 void TreeSerializer::visit(const StatementList* statement_list) {
 
     if (statement_list == nullptr) {
+
         return;
     }
 
@@ -255,8 +261,7 @@ void TreeSerializer::visit(const StatementList* statement_list) {
         parent_ = STATEMENT_LIST;
         statement_list->other_statements_->accept(this);
     }
-
-
+    
 }
 
 void TreeSerializer::visit(const AssignSubscriptStatement* assign_subscript_statement) {
@@ -493,16 +498,4 @@ void TreeSerializer::visit(const NegationExpression* negation_expression) {
 
     parent_ = NEGATION_EXPRESSION;
     negation_expression->expression_to_negate_->accept(this);
-}
-
-void TreeSerializer::visit(const UnaryMinusExpression* unary_minus_expression) {
-    
-    if (unary_minus_expression == nullptr) {
-        return;
-    }
-
-    add_edge_(parent_, UNARY_MINUS_EXPRESSION);
-
-    parent_ = UNARY_MINUS_EXPRESSION;
-    unary_minus_expression->expression_->accept(this);
 }
