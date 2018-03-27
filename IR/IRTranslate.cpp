@@ -668,7 +668,7 @@ const IExp* IRTranslate::get_class_var_exp(const Symbol* varName) {
 				new BinopExp(irtree,
 					IRTree_OP::OP_BIN::PLUS_, 
 					new TempExp(irtree,Temp("r1")),
-					new ConstExp(irtree,varOffset)), 
+					new ConstExp(irtree,(varOffset+1)*WORD_SIZE)), 
 				WORD_SIZE);
 			break;
 		}

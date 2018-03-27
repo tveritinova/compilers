@@ -84,12 +84,17 @@ public:
 
         auto class_info = new ClassInfo(class_decl->_class_id, class_decl->_base_class_id);
 
+        std::vector<const VarDecl*> class_fields_list_inverted;
         auto var_decs = class_decl->_vars;
 
         while (var_decs) {
-            class_info->add_field(new VariableInfo(var_decs->_var_dec->_type->id, 
-                var_decs->_var_dec->_var_id));
+            class_fields_list_inverted.push_back(var_decs->_var_dec);
             var_decs = var_decs->_other_var_decs;
+        }
+
+        for (int i=class_fields_list_inverted.size()-1; i >=0; i--) {
+            class_info->add_field(new VariableInfo(class_fields_list_inverted[i]->_type->id, 
+                class_fields_list_inverted[i]->_var_id));
         }
 
         auto method_decs = class_decl->_methods;
@@ -112,12 +117,24 @@ public:
                 arglist = arglist->other_args_;
             }
 
-            auto vardecs = method_decl->var_decls_;
+            /*auto vardecs = method_decl->var_decls_;
             while (vardecs) {
                 new_method->add_local_var(new VariableInfo(vardecs->_var_dec->_type->id, 
                     vardecs->_var_dec->_var_id));
 
                 vardecs = vardecs->_other_var_decs;
+            }*/
+
+            std::vector<const VarDecl*> vars_list_inverted;
+            auto vardecs = method_decl->var_decls_;
+            while (vardecs) {
+                vars_list_inverted.push_back(vardecs->_var_dec);
+                vardecs = vardecs->_other_var_decs;
+            }
+
+            for (int i=vars_list_inverted.size()-1; i >=0; i--) {
+                new_method->add_local_var(new VariableInfo(vars_list_inverted[i]->_type->id, 
+                    vars_list_inverted[i]->_var_id));
             }
 
             class_info->add_method(new_method);
