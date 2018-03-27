@@ -341,11 +341,19 @@ public:
 
 	void print(IRTree& tree) const {
 		std::cout << "in print seq stmnt" << std::endl;
-		tree.add_record(id, label, left->id, left->label);
+
+		if (left) {
+			tree.add_record(id, label, left->id, left->label);
+		}
+
 		if (right) {
 			tree.add_record(id, label, right->id, right->label);
 		}
-		left->print(tree);
+
+		if (left) {
+			left->print(tree);
+		}
+		
 		if (right) {
 			right->print(tree);
 		}

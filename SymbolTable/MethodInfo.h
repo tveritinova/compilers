@@ -1,7 +1,8 @@
 #ifndef METHODINFO_H
 #define METHODINFO_H
 
-#include <map>
+#include <vector>
+#include <assert.h>
 
 #include "Symbol.h"
 #include "VariableInfo.h"
@@ -18,8 +19,8 @@ public:
 
     const SymbolTable::Symbol* get_method_id() const;
     const SymbolTable::Symbol* get_return_type_id() const;
-    const std::map<const SymbolTable::Symbol*, const VariableInfo*>& get_args() const;
-    const std::map<const SymbolTable::Symbol*, const VariableInfo*>& get_locals() const;
+    const std::vector<std::pair<const SymbolTable::Symbol*, const VariableInfo*>>& get_args() const;
+    const std::vector<std::pair<const SymbolTable::Symbol*, const VariableInfo*>>& get_locals() const;
 
     void add_arg(const VariableInfo* variable_info, Position pos);
     void add_local_var(const VariableInfo* variable_info);
@@ -31,8 +32,8 @@ public:
 
 private:
 
-    std::map<const SymbolTable::Symbol*, const VariableInfo*> args;
-    std::map<const SymbolTable::Symbol*, const VariableInfo*> locals;
+    std::vector<std::pair<const SymbolTable::Symbol*, const VariableInfo*>> args;
+    std::vector<std::pair<const SymbolTable::Symbol*, const VariableInfo*>> locals;
 
     const SymbolTable::Symbol* return_type_id;
     const SymbolTable::Symbol* method_id;

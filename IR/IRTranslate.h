@@ -9,7 +9,6 @@ static int WORD_SIZE = 4;
 static int MAX_IN_REG = 4;
 
 static int intSize = 1 * WORD_SIZE;
-static int shortSize = 1 * WORD_SIZE;
 static int booleanSize = 1 * WORD_SIZE;
 static int referenceSize = 1 * WORD_SIZE;
 
@@ -33,7 +32,7 @@ class IRTranslate : public Visitor {
 public:
 
 	IRTranslate(Table* _table): table(_table), irtree() {}
-	
+
 	CCodeFragment* programTranslation;
 
 	void visit(const SymbolTable::Symbol*) {}
@@ -73,13 +72,14 @@ private:
 	IRTree irtree;
 
 	ISubtreeWrapper* lastWrapper = nullptr;
-	const IStm* lastStmtListBody = nullptr;
+	std::vector<const IStm*> lastStmtListBody;
 	const ExpList* lastExpListBody = nullptr;
 	CCodeFragment* lastTranslation = nullptr;
 	CCodeFragment* resultTranslation = nullptr;
 
 	const Table* table;
 	const SymbolTable::Symbol* currentClassName;
+	const SymbolTable::Symbol* currentMethodName;
 
 	std::vector<const AR::IFrame*> classFrames;
 

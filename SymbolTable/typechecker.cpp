@@ -613,12 +613,21 @@ void TypeChecker::visit(const IdExpression* node) {
     //printf("in id expression %s\n", node->id_->String().c_str());
 
     if (current_method->has_arg(node->id_)) {
-        types.push(current_method->get_args().at(node->id_)->get_type());
+        for (auto p: current_method->get_args()) {
+            if (p.first == node->id_) {
+                types.push(p.second->get_type());
+                break;
+            }
+        }
         return;
     }
 
     if (current_method->has_local_var(node->id_)) {
-        types.push(current_method->get_locals().at(node->id_)->get_type());
+        for (auto p: current_method->get_locals()) {
+            if (p.first == node->id_) {
+                types.push(p.second->get_type());
+            }
+        }
         return;
     }
 

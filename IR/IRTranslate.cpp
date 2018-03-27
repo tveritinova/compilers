@@ -94,6 +94,7 @@ void IRTranslate::visit(const MethodDeclList* method_decl_list) {
 
     if (method_decl_list->method_decl_) {
 		currentFrame = get_frame_for_method(method_decl_list->method_decl_->method_id_);
+		currentMethodName = nullptr;
         method_decl_list->method_decl_->accept(this);
     }
 }
@@ -102,6 +103,7 @@ void IRTranslate::visit(const MethodDecl* method_decl) {
 
 	std::cout << std::endl << "~~~~~ visit method " << method_decl->method_id_->String() << std::endl << std::endl;
 
+	currentMethodName =  method_decl->method_id_;
 
     if (method_decl->arg_list_) {
         method_decl->arg_list_->accept(this);
@@ -120,10 +122,10 @@ void IRTranslate::visit(const MethodDecl* method_decl) {
 
 	std::cout << "- in visit metho decl" << std::endl;
 
-	if (lastStmtListBody == nullptr) std::cout << "lastStmtListBody nullptr" << std::endl;
+	if (lastStmtListBody.size() == 0) std::cout << "lastStmtListBody empty" << std::endl;
 
 	const IStm* body(new ExpStm(irtree,
-		new EseqExp(irtree, lastStmtListBody, lastWrapper->to_exp()))); // lastWrapper for return, lastStmtListBody for stmt lists 
+		new EseqExp(irtree, lastStmtListBody[lastStmtListBody.size()-1], lastWrapper->to_exp()))); // lastWrapper for return, lastStmtListBody for stmt lists 
 
 	lastWrapper = nullptr;
 
@@ -140,7 +142,7 @@ void IRTranslate::visit(const StatementList* statement_list) {
 	std::cout << "- in visit stmnt list" << std::endl;
 
 	if (!statement_list) {
-		lastStmtListBody = new ExpStm(irtree,new ConstExp(irtree,0));
+		lastStmtListBody.push_back(new ExpStm(irtree,new ConstExp(irtree,0)));
 		return;
 	}
 
@@ -148,13 +150,17 @@ void IRTranslate::visit(const StatementList* statement_list) {
     	std::cout << "other not null" << std::endl;
         statement_list->other_statements_->accept(this);
         statement_list->statement_->accept(this);
-        lastStmtListBody = new SeqStm(irtree,lastWrapper->to_stmt(), lastStmtListBody);
+        const IStm* lastStmtListBody_ = lastStmtListBody[lastStmtListBody.size() - 1];
+        lastStmtListBody.pop_back();
+        lastStmtListBody.push_back(new SeqStm(irtree,lastStmtListBody_, lastWrapper->to_stmt()));
+        std::cout << "ADDED LAST WRAPPER TO STMT LIST" << std::endl;
         lastWrapper = nullptr;
     } else {
     	std::cout << "other null" << std::endl;
     	statement_list->statement_->accept(this);
     	//if (lastStmt == nullptr) std::cout << "lastStmt null" << std::endl;
-    	lastStmtListBody = lastWrapper->to_stmt();
+    	lastStmtListBody.push_back(lastWrapper->to_stmt());
+    	std::cout << "INIT STMT LIST" << std::endl;
     	lastWrapper = nullptr;
     }
 
@@ -180,8 +186,8 @@ void IRTranslate::visit(const IfStatement* if_statement) {
     const ISubtreeWrapper* thenStateWrapper;
     if (typeid(*if_statement->statement_if_true_) == typeid(StatementList)) {
     	std::cout  << std::endl << "+++++++++++++LIST IN IF+++++++++++++" << std::endl << std::endl;
-    	thenStateWrapper = new StmWrapper(irtree, lastStmtListBody);
-    	lastStmtListBody = nullptr;
+    	thenStateWrapper = new StmWrapper(irtree, lastStmtListBody[lastStmtListBody.size()-1]);
+    	lastStmtListBody.pop_back();
     } else {
     	thenStateWrapper = lastWrapper;
     	lastWrapper = nullptr;
@@ -191,8 +197,8 @@ void IRTranslate::visit(const IfStatement* if_statement) {
     const ISubtreeWrapper* elseStateWrapper;
     if (typeid(*if_statement->statement_if_false_) == typeid(StatementList)) {
     	std::cout  << std::endl << "+++++++++++++LIST IN IF+++++++++++++" << std::endl << std::endl;
-    	elseStateWrapper = new StmWrapper(irtree, lastStmtListBody);
-    	lastStmtListBody = nullptr;
+    	elseStateWrapper = new StmWrapper(irtree, lastStmtListBody[lastStmtListBody.size() - 1]);
+    	lastStmtListBody.pop_back();
     } else {
     	elseStateWrapper = lastWrapper;
     	lastWrapper = nullptr;
@@ -244,8 +250,8 @@ void IRTranslate::visit(const WhileStatement* while_statement) {
     while_statement->inloop_statement_->accept(this);
     const ISubtreeWrapper* inloopStmtWrapper;
     if (typeid(*(while_statement->inloop_statement_)) == typeid(StatementList)) {
-    	inloopStmtWrapper = new StmWrapper(irtree, lastStmtListBody);
-    	lastStmtListBody = nullptr;
+    	inloopStmtWrapper = new StmWrapper(irtree, lastStmtListBody[lastStmtListBody.size()-1]);
+    	lastStmtListBody.pop_back();
     } else {
     	inloopStmtWrapper = lastWrapper;
     	lastWrapper = nullptr;
@@ -573,23 +579,19 @@ void IRTranslate::visit(const NewIntArrayExpression* node) {
 	Temp temp("temp");
 
 	IExp* body = new EseqExp(irtree,
-		new SeqStm(irtree,
-			new MoveStm(irtree,
-				new TempExp(irtree,temp),
-				new CallExp(irtree,
-					new NameExp(irtree,Label("malloc")),
-					new ExpList(
+		new MoveStm(irtree,
+			new TempExp(irtree,temp),
+			new CallExp(irtree,
+				new NameExp(irtree,Label("malloc")),
+				new ExpList(
+					new BinopExp(irtree,
+						IRTree_OP::OP_BIN::PLUS_,
 						new BinopExp(irtree,
-							IRTree_OP::OP_BIN::PLUS_,
-							new BinopExp(irtree,
-								IRTree_OP::OP_BIN::MULTIPLY_,
-								lastWrapper->to_exp(),
-								new ConstExp(irtree,WORD_SIZE)),
-							new ConstExp(irtree,intSize)),
-						nullptr))),
-			new MoveStm(irtree,
-				new TempExp(irtree,temp),
-				lastWrapper->to_exp())),
+							IRTree_OP::OP_BIN::MULTIPLY_,
+							lastWrapper->to_exp(),
+							new ConstExp(irtree,WORD_SIZE)),
+						new ConstExp(irtree,intSize)),
+					nullptr))),
 		new TempExp(irtree,temp));
 
 	lastWrapper = nullptr; /// MAYBE THIS
@@ -611,7 +613,7 @@ void IRTranslate::visit(const NewObjectExpression* node) {
 
 	IExp* body= new CallExp(irtree,
 			new NameExp(irtree,Label("malloc")),
-			new ExpList(new ConstExp(irtree,classSize),nullptr));
+			new ExpList(new ConstExp(irtree, classSize * WORD_SIZE),nullptr));
 
 	lastWrapper = new ExpWrapper(irtree,body);
 }
@@ -652,23 +654,54 @@ void IRTranslate::visit(const NegationExpression* node) {
 
 const IExp* IRTranslate::get_class_var_exp(const Symbol* varName) {
 
+	std::cout << std::endl << "+ + + + IN GET CLASS VAR EXP + + + + " << std::endl << std::endl;
+
 	Position pos;
 	int varOffset = 0;
 
-	for (auto p: table->get_class(currentClassName, pos)->get_fields()) {
+	auto fields = table->get_class(currentClassName, pos)->get_fields();
+
+	for (auto p: fields) {
 		if (p.first == varName) {
+			std::cout << "found " << varName->String() << std::endl << std::endl;
+			return new MemExp(irtree,
+				new BinopExp(irtree,
+					IRTree_OP::OP_BIN::PLUS_, 
+					new TempExp(irtree,Temp("r1")),
+					new ConstExp(irtree,varOffset)), 
+				WORD_SIZE);
 			break;
 		}
-
-		++varOffset;
+		varOffset += 1;
 	}
 
-	return new MemExp(irtree,
-		new BinopExp(irtree,
-			IRTree_OP::OP_BIN::PLUS_, 
-			new TempExp(irtree,Temp("r1")),
-			new ConstExp(irtree,varOffset)), 
-		WORD_SIZE);
+
+	//std::cout << varOffset << " " << fields.size() << std::endl;
+	
+
+	if (varOffset == fields.size()) {
+		std::cout << "true" << std::endl;
+		bool found = false;
+		for (auto p: table->get_class(currentClassName, pos)->get_methods()) {
+			if (p.first == currentMethodName) {
+				int offset = 0;
+				for (auto p2: p.second->get_args()) {
+					if (p2.first == varName) {
+						return new MemExp(irtree, new TempExp(irtree,Temp("r" + std::to_string(1 + 1 + offset))), WORD_SIZE);
+					}
+					offset += 1;
+				}
+				found = true;
+				break;
+			}
+		}
+
+		if (!found) {
+			assert(false);
+		}
+	}
+
+	
 }
 
 
