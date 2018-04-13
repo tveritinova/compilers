@@ -2,10 +2,11 @@
 #define H_ACCESS
 
 #include "../SymbolTable/Symbol.h"
-#include "../IR/IRTree_classes.h"
-#include "../IR/IRTree.h"
 #include "../IR/Temp.h"
+#include "../IR/IExp.h"
 #include <string>
+
+//class IRTree;
 
 namespace AR {
 
@@ -33,7 +34,7 @@ namespace AR {
 		virtual ~IAccess() {}
 		virtual const T_RecordsType get_type() = 0;
 		virtual const int get_size() const = 0;
-		virtual void print(const Temp* fp) const = 0;
+		//virtual void print(const Temp* fp) const = 0;
 		virtual const IExp* get_exp(IRTree& tree, const Temp framePtr) const = 0;
 	};
 

@@ -35,7 +35,7 @@ public:
 	}
 
 	const IStm* to_cond(const  Label t, const  Label f) const {
-		std::cout << "and exp to cond" << std::endl;
+		//std::cout << "and exp to cond" << std::endl;
 		Label z("rightTrue");
 		return new SeqStm(tree,
 			new CJumpStm(tree,IRTree_OP::OP_COMPARE::EQ_, left, new ConstExp(tree,1), z, f), 

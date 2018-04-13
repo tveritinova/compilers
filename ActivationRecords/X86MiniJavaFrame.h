@@ -11,8 +11,8 @@
 #include "Frame.h"
 #include "Access.h"
 #include "../SymbolTable/Symbol.h"
-#include "InRegAccess.h"
-#include "InFrameAccess.h"
+//#include "InRegAccess.h"
+//#include "InFrameAccess.h"
 
 namespace AR {
 

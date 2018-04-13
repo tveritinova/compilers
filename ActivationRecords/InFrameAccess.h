@@ -5,6 +5,7 @@
 #include "Access.h"
 #include "Frame.h"
 #include "../IR/IRTree_OP.h"
+#include "../IR/MemExp.h"
 #include <iostream>
 
 namespace AR {
@@ -21,9 +22,9 @@ namespace AR {
 
 		const int get_offset() const { return offset; }
 
-		virtual void print(const Temp* fp) const override {
+		/*virtual void print(const Temp* fp) const override {
 			std::cout << "In frame position " << std::endl;
-		}
+		}*/
 
 		virtual const IExp* get_exp(IRTree& tree, const Temp framePtr) const override {
 		return new MemExp(tree,

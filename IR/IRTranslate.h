@@ -33,7 +33,7 @@ public:
 
 	IRTranslate(Table* _table): table(_table), irtree() {}
 
-	CCodeFragment* programTranslation;
+	//CCodeFragment* programTranslation;
 
 	void visit(const SymbolTable::Symbol*) {}
 	void visit(const ArgumentList*) {}
@@ -74,8 +74,8 @@ private:
 	ISubtreeWrapper* lastWrapper = nullptr;
 	std::vector<const IStm*> lastStmtListBody;
 	const ExpList* lastExpListBody = nullptr;
-	CCodeFragment* lastTranslation = nullptr;
-	CCodeFragment* resultTranslation = nullptr;
+	//CCodeFragment* lastTranslation = nullptr;
+	//CCodeFragment* resultTranslation = nullptr;
 
 	const Table* table;
 	const SymbolTable::Symbol* currentClassName;

@@ -2,7 +2,7 @@
 
 void IRTranslate::visit(const Program* program) {
 
-	std::cout << "in visit prog" << std::endl;
+	//std::cout << "in visit prog" << std::endl;
 
 	if (program == nullptr) {
         return;
@@ -13,38 +13,21 @@ void IRTranslate::visit(const Program* program) {
     if (program->_classes) {
         program->_classes->accept(this);
     }
-
-	lastTranslation = resultTranslation;
-
-	while (lastTranslation != nullptr) {
-
-		//std::cout << "--- result tree not nullptr ---" << std::endl;
-
-		std::cout << std::endl << " ++++ " << std::endl << lastTranslation->fragmentName << std::endl << " ++++ " << std::endl << std::endl;
-
-		irtree.add_record(lastTranslation->fragmentName, 
-			lastTranslation->fragmentName,
-			lastTranslation->body->id, lastTranslation->body->label);
-
-		lastTranslation->body->print(irtree);
-
-		lastTranslation = lastTranslation->next;
-	}
-
-	irtree.end_printing(); 
 	
-	std::cout << "after while" << std::endl;
+	//std::cout << "after while" << std::endl;
 }
 
 void IRTranslate::visit(const MainClass* main_class) {
 	
-	std::cout << std::endl << "~~~~~ in visit main class ~~~~~" << std::endl << std::endl;
+	//std::cout << std::endl << "~~~~~ in visit main class ~~~~~" << std::endl << std::endl;
 
 	main_class->_main_body->accept(this);
 
-	resultTranslation = new CCodeFragment("Main", new AR::X86MiniJavaFrame(), lastWrapper->to_stmt());
+	CCodeFragment* newTranslation = new CCodeFragment("Main", new AR::X86MiniJavaFrame(), lastWrapper->to_stmt());
+
+	irtree.forest.push_back(newTranslation);
 	lastWrapper = nullptr;
-	lastTranslation = resultTranslation;
+	//lastTranslation = resultTranslation;
 }
 
 void IRTranslate::visit(const ClassDeclList* class_decl_list) {
@@ -65,7 +48,7 @@ void IRTranslate::visit(const ClassDecl* class_decl) {
 
 	//std::cout << "in visit class decl" << std::endl;
 
-	std::cout << std::endl << "~~~~~ visit class " << class_decl->_class_id->String() << " ~~~~~" << std::endl << std::endl;
+	//std::cout << std::endl << "~~~~~ visit class " << class_decl->_class_id->String() << " ~~~~~" << std::endl << std::endl;
 
     currentClassName = class_decl->_class_id;
 
@@ -120,9 +103,9 @@ void IRTranslate::visit(const MethodDecl* method_decl) {
 
 	method_decl->return_expression_->accept(this);
 
-	std::cout << "- in visit metho decl" << std::endl;
+	//std::cout << "- in visit metho decl" << std::endl;
 
-	if (lastStmtListBody.size() == 0) std::cout << "lastStmtListBody empty" << std::endl;
+	//if (lastStmtListBody.size() == 0) std::cout << "lastStmtListBody empty" << std::endl;
 
 	const IStm* body(new ExpStm(irtree,
 		new EseqExp(irtree, lastStmtListBody[lastStmtListBody.size()-1], lastWrapper->to_exp()))); // lastWrapper for return, lastStmtListBody for stmt lists 
@@ -133,8 +116,11 @@ void IRTranslate::visit(const MethodDecl* method_decl) {
 		currentClassName->String() + "_" + method_decl->method_id_->String(), 
 		currentFrame, body);
 
-	lastTranslation->next = newTranslation;
-	lastTranslation = newTranslation;
+
+	irtree.forest.push_back(newTranslation);
+
+	//lastTranslation->next = newTranslation;
+	//lastTranslation = newTranslation;
 }
 
 void IRTranslate::visit(const StatementList* statement_list) {
@@ -185,7 +171,7 @@ void IRTranslate::visit(const IfStatement* if_statement) {
 
     const ISubtreeWrapper* thenStateWrapper;
     if (typeid(*if_statement->statement_if_true_) == typeid(StatementList)) {
-    	std::cout  << std::endl << "+++++++++++++LIST IN IF+++++++++++++" << std::endl << std::endl;
+    	//std::cout  << std::endl << "+++++++++++++LIST IN IF+++++++++++++" << std::endl << std::endl;
     	thenStateWrapper = new StmWrapper(irtree, lastStmtListBody[lastStmtListBody.size()-1]);
     	lastStmtListBody.pop_back();
     } else {
@@ -196,7 +182,7 @@ void IRTranslate::visit(const IfStatement* if_statement) {
     if_statement->statement_if_false_->accept(this);
     const ISubtreeWrapper* elseStateWrapper;
     if (typeid(*if_statement->statement_if_false_) == typeid(StatementList)) {
-    	std::cout  << std::endl << "+++++++++++++LIST IN IF+++++++++++++" << std::endl << std::endl;
+    	//std::cout  << std::endl << "+++++++++++++LIST IN IF+++++++++++++" << std::endl << std::endl;
     	elseStateWrapper = new StmWrapper(irtree, lastStmtListBody[lastStmtListBody.size() - 1]);
     	lastStmtListBody.pop_back();
     } else {
@@ -213,7 +199,7 @@ void IRTranslate::visit(const IfStatement* if_statement) {
 	Label f("false");
 	Label q("quitCondition");
 
-	std::cout << "before create if body" << std::endl;
+	//std::cout << "before create if body" << std::endl;
  
 	body = new SeqStm(irtree,
 		new SeqStm(irtree,
@@ -231,7 +217,7 @@ void IRTranslate::visit(const IfStatement* if_statement) {
 
 	lastWrapper = new StmWrapper(irtree,body);
 
-	std::cout << "end visit if" << std::endl;
+	//std::cout << "end visit if" << std::endl;
 }
 
 

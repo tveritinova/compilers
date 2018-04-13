@@ -1,8 +1,14 @@
 #ifndef H_WRAPS
 #define H_WRAPS
 
-#include "IRTree_classes.h"
+//#include "IRTree_classes.h"
+#include "IExp.h"
+#include "IStm.h"
+#include "Label.h"
+#include "ExpStm.h"
 #include "IRTree_OP.h"
+
+#include <iostream>
 
 
 class ISubtreeWrapper {

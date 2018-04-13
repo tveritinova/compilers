@@ -9,28 +9,40 @@
 #include <fstream>
 #include <cassert>
 
+#include "CCodeFragment.h"
 #include "IRTree_OP.h"
 
 class IRTree {
 
 public:
 
+	std::vector<CCodeFragment*> forest;
+
 	IRTree():fout("ir_graph.dot") { 
 		std::cout << "create IRTree" << std::endl;
 		fout << "digraph G" << std::endl << "{" << std::endl; 
 	}
 
-	void add_record(std::string first_id, std::string first_label, 
-		std::string second_id, std::string second_label) {
+	void add_record(/*std::string first_id, */std::string first_label, 
+		/*std::string second_id,*/ std::string second_label) {
 
 		std::cout << std::endl << "add record " << first_id << " " << second_id << std::endl << std::endl;
 		
-		fout << "{" << first_id << "[label=\"" << first_label << "\"]}";
+		fout << "{" << get_tree_name(first_label) << "[label=\"" << first_label << "\"]}";
 		fout << "->";
-		fout << "{" << second_id << "[label=\"" << second_label << "\"]};" << std::endl;
+		fout << "{" << get_tree_name(second_label) << "[label=\"" << second_label << "\"]};" << std::endl;
 	}
 
-	void end_printing() {
+	void print() {
+
+		for (auto translation: forest) {
+			this->add_record(
+				translation->fragmentName, translation->fragmentName,
+				translation->body->id, translation->body->label);
+
+			translation->body->print(*this);
+		}
+
 		fout << "}" << std::endl;
 		fout.close();
 	}

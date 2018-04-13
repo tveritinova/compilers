@@ -17,7 +17,7 @@ class BBS{
     // Methods
     public int Start(int sz){
 	int aux01 ;
-	aux01 = this.Init(sz);
+	aux01 = this.Init(sz); // r1+2
 	aux01 = this.Print();
 	System.out.println(99999);
 	aux01 = this.Sort();

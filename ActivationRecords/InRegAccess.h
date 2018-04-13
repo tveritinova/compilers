@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include "Access.h"
+#include "../IR/TempExp.h"
 
 namespace AR {
 
@@ -21,9 +22,9 @@ namespace AR {
 
 		virtual const int get_reg_number() const { return reg_number; }
 
-		virtual void print(const Temp* fp) const override {
+		/*virtual void print(const Temp* fp) const override {
 			std::cout << "Register: " << reg_number << std::endl; 
-		}
+		}*/
 
 		virtual const IExp* get_exp(IRTree& tree, const Temp framePtr) const override {
 			return new TempExp(tree, temp);

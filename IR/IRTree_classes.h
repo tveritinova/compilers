@@ -4,21 +4,9 @@
 
 #include "IRTree.h"
 #include "Temp.h"
-
-
-struct Label {
-	std::string lName;
-	Label(std::string _lName): lName(_lName) { /*std::cout << "init label " << lName << std::endl;*/ }
-};
-
-
-class IExp {
-public:
-	std::string id="";
-	virtual ~IExp() {}
-	virtual void print(IRTree& tree) const= 0;
-	std::string label;
-};
+#include "IStm.h"
+#include "IExp.h"
+#include "Label.h"
 
 
 class ExpList {
@@ -29,7 +17,7 @@ public:
 
 	ExpList(const IExp* _cur, const ExpList* _others): cur(_cur), others(_others) {};
 
-	void print(IRTree& tree) const {
+	void print(/*IRTree& tree*/) const {
 		std::cout << "in print exp list" << std::endl;
 
 		if (!cur) {
@@ -46,13 +34,7 @@ public:
 };
 
 
-class IStm {
-public:
-	std::string id = "";
-	virtual ~IStm() {}
-	virtual void print(IRTree& tree) const = 0;
-	std::string label;
-};
+
 
 class StmList {
 public:
@@ -105,24 +87,6 @@ public:
 
 };
 
-class TempExp : public IExp {
-public:
-	Temp temp;
-
-	TempExp(IRTree& tree, Temp _temp): temp(_temp) {
-		//std::cout << "create temp exp" << std::endl;
-		label = "TEMP";
-		id = tree.get_tree_name(label);
-		std::cout << "create temp expr " << id << std::endl;
-	}
-
-	void print(IRTree& tree) const {
-		std::cout << "in print temp exp" << std::endl;
-		std::cout << "000000     " << temp.tName << std::endl;
-		tree.add_record(id, label, tree.get_tree_name(temp.tName), temp.tName);
-	}
-};
-
 class BinopExp : public IExp {
 public:
 	const IRTree_OP::OP_BIN binop;
@@ -142,30 +106,6 @@ public:
 		tree.add_record(id, label, right->id, right->label);
 		left->print(tree);
 		right->print(tree);
-	}
-
-};
-
-
-class MemExp : public IExp {
-public:
-	const IExp* exp; 
-	const int size; 
-
-	MemExp(IRTree& tree, const IExp* _exp, int _size): exp(_exp), size(_size){
-		//std::cout << "create mem exp" << std::endl;
-		label = "MEM";
-		id = tree.get_tree_name(label);
-		std::cout << "create mem expr " << id << std::endl;
-	}
-
-	void print(IRTree& tree) const {
-		std::cout << "in print mem exp" << std::endl;
-		tree.add_record(id, label, exp->id, exp->label);
-		tree.add_record(id, label, 
-			tree.get_tree_name("memzize_" + std::to_string(size)), 
-			std::to_string(size));
-		exp->print(tree);
 	}
 
 };
@@ -252,27 +192,6 @@ public:
 		left->print(tree);
 		right->print(tree);
 	}
-};
-
-
-
-class ExpStm : public IStm {
-public:
-	const IExp* exp;
-
-	ExpStm(IRTree& tree, const IExp* _exp) : exp(_exp) {
-		label = "EXP";
-		id = tree.get_tree_name(label);
-		std::cout << "create exp stmt " << id << std::endl;
-	}
-
-	void print(IRTree& tree) const {
-		std::cout << "in print exp stmnt" << std::endl;
-		//std::cout << exp->id << std::endl;
-		tree.add_record(id, label, exp->id, exp->label);
-		exp->print(tree);
-	}
-
 };
 
 
