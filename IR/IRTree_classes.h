@@ -2,8 +2,25 @@
 #ifndef H_IRCLASSES
 #define H_IRCLASSES
 
+class ExpList;
+class StmList;
+class ConstExp;
+class NameExp;
+class TempExp;
+class BinopExp;
+class CallExp;
+class EseqExp;
+class MoveStm;
+class JumpStm;
+class CJumpStm;
+class SeqStm;
+class LabelStm;
+class ExpStm;
+class MemExp;
+
 #include "IRTree.h"
 #include "Temp.h"
+#include "../Canonizer/IRTreeVisitor.h"
 
 
 struct Label {
@@ -18,6 +35,8 @@ public:
 	virtual ~IExp() {}
 	virtual void print(IRTree& tree) const= 0;
 	std::string label;
+
+	
 };
 
 
@@ -43,6 +62,10 @@ public:
 			others->print(tree);
 		}
 	}
+
+	void accept(IRTreeVisitor* visitor) const {
+        visitor->visit(this);
+    }
 };
 
 
@@ -52,6 +75,7 @@ public:
 	virtual ~IStm() {}
 	virtual void print(IRTree& tree) const = 0;
 	std::string label;
+
 };
 
 class StmList {
@@ -60,6 +84,10 @@ public:
 	const StmList* others;
 
 	StmList(const IStm* _cur, const StmList* _others) : cur(_cur), others(_others) {};
+
+	void accept(IRTreeVisitor* visitor) const {
+        visitor->visit(this);
+    }
 };
 
 
@@ -85,6 +113,10 @@ public:
 			tree.get_tree_name("const_" + std::to_string(value)), 
 			std::to_string(value));
 	}
+
+	void accept(IRTreeVisitor* visitor) const {
+        visitor->visit(this);
+    }
 };
 
 class NameExp: public IExp {
@@ -103,6 +135,9 @@ public:
 		std::cout << "end print name exp" << std::endl;
 	}
 
+	void accept(IRTreeVisitor* visitor) const {
+        visitor->visit(this);
+    }
 };
 
 class TempExp : public IExp {
@@ -121,6 +156,10 @@ public:
 		std::cout << "000000     " << temp.tName << std::endl;
 		tree.add_record(id, label, tree.get_tree_name(temp.tName), temp.tName);
 	}
+
+	void accept(IRTreeVisitor* visitor) const {
+        visitor->visit(this);
+    }
 };
 
 class BinopExp : public IExp {
@@ -144,6 +183,9 @@ public:
 		right->print(tree);
 	}
 
+	void accept(IRTreeVisitor* visitor) const {
+        visitor->visit(this);
+    }
 };
 
 
@@ -167,6 +209,10 @@ public:
 			std::to_string(size));
 		exp->print(tree);
 	}
+
+	void accept(IRTreeVisitor* visitor) const {
+        visitor->visit(this);
+    }
 
 };
 
@@ -196,6 +242,10 @@ public:
 
 		args->print(tree);
 	}
+
+	void accept(IRTreeVisitor* visitor) const {
+        visitor->visit(this);
+    }
 };
 
 
@@ -221,6 +271,10 @@ public:
 		stm->print(tree);
 		exp->print(tree);
 	}
+
+	void accept(IRTreeVisitor* visitor) const {
+        visitor->visit(this);
+    }
 };
 
 
@@ -252,6 +306,10 @@ public:
 		left->print(tree);
 		right->print(tree);
 	}
+
+	void accept(IRTreeVisitor* visitor) const {
+        visitor->visit(this);
+    }
 };
 
 
@@ -272,6 +330,10 @@ public:
 		tree.add_record(id, label, exp->id, exp->label);
 		exp->print(tree);
 	}
+
+	void accept(IRTreeVisitor* visitor) const {
+        visitor->visit(this);
+    }
 
 };
 
@@ -295,6 +357,10 @@ public:
 			tree.add_record(id, label, tree.get_tree_name(targets[i].lName), targets[i].lName);
 		exp->print(tree);
 	}
+
+	void accept(IRTreeVisitor* visitor) const {
+        visitor->visit(this);
+    }
 };
 
 
@@ -325,6 +391,10 @@ public:
 		left->print(tree);
 		right->print(tree);
 	}
+
+	void accept(IRTreeVisitor* visitor) const {
+        visitor->visit(this);
+    }
 };
 
 
@@ -358,6 +428,10 @@ public:
 			right->print(tree);
 		}
 	}
+
+	void accept(IRTreeVisitor* visitor) const {
+        visitor->visit(this);
+    }
 };
 
 
@@ -376,6 +450,10 @@ public:
 		//std::cout << "() " << label_class.lName << std::endl;
 		tree.add_record(id, label, tree.get_tree_name(label_class.lName), label_class.lName);
 	}
+
+	void accept(IRTreeVisitor* visitor) const {
+        visitor->visit(this);
+    }
 };
 
 #endif
