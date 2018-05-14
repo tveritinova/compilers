@@ -36,7 +36,7 @@ public:
 	virtual void print(IRTree& tree) const= 0;
 	std::string label;
 
-	
+	virtual void accept(IRTreeVisitor* visitor) const = 0;
 };
 
 
@@ -75,6 +75,9 @@ public:
 	virtual ~IStm() {}
 	virtual void print(IRTree& tree) const = 0;
 	std::string label;
+
+
+	virtual void accept(IRTreeVisitor* visitor) const = 0;
 
 };
 

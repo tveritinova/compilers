@@ -7,16 +7,16 @@ void Canonizer::visit(const ExpList* e) {
 	const IExp* cur = e->cur;
 	const ExpList* others = e->others;
 
-	//cur->accept(this);
-	//others->accept(this);
+	cur->accept(this);
+	others->accept(this);
 }
 
 void Canonizer::visit(const StmList* e) {
 	const IStm* cur = e->cur;
 	const StmList* others = e->others;
 
-	//cur->accept(this);
-	//others->accept(this);
+	cur->accept(this);
+	others->accept(this);
 }
 
 void Canonizer::visit(const ConstExp* e) {
@@ -36,8 +36,8 @@ void Canonizer::visit(const BinopExp* e) {
 	const IExp* left = e->left;
 	const IExp* right = e->right;
 
-	//left->accept(this);
-	//right->accept(this);s
+	left->accept(this);
+	right->accept(this);
 
 	//IStm* leftStatements = reorder(left);
     //IStm* rightStatements = reorder(right);
@@ -56,37 +56,37 @@ void Canonizer::visit(const CallExp* e) {
 	const IExp* func = e->func;
 	ExpList* args = e->args;
 
-	//func->accept(this);
-	//args->accept(this);
+	func->accept(this);
+	args->accept(this);
 }
 
 void Canonizer::visit(const EseqExp* e) {
 	const IStm* stm = e->stm;
 	const IExp* exp = e->exp;
 
-	//stm->accept(this);
-	//exp->accept(this);
+	stm->accept(this);
+	exp->accept(this);
 }
 
 void Canonizer::visit(const MoveStm* e) {
 	const IExp* left = e->left;
 	const IExp* right = e->right;
 
-	//left->accept(this);
-	//right->accept(this);
+	left->accept(this);
+	right->accept(this);
 }
 
 void Canonizer::visit(const ExpStm* e) {
 	const IExp* exp = e->exp;
 
-	//exp->accept(this);
+	exp->accept(this);
 }
 
 void Canonizer::visit(const JumpStm* e) {
 	const IExp* exp = e->exp;
 	std::vector<Label> targets = e->targets; // not necassery
 
-	//exp->accept(this);
+	exp->accept(this);
 }
 
 void Canonizer::visit(const CJumpStm* e) {
@@ -96,16 +96,16 @@ void Canonizer::visit(const CJumpStm* e) {
 	Label iftrue = e->iftrue;
 	Label iffalse = e->iffalse;
 
-	//left->accept(this);
-	//right->accept(this);
+	left->accept(this);
+	right->accept(this);
 }
 
 void Canonizer::visit(const SeqStm* e) {
 	const IStm* left = e->left;
 	const IStm* right = e->right;
 
-	//left->accept(this);
-	//right->accept(this);
+	left->accept(this);
+	right->accept(this);
 }
 
 
