@@ -1,22 +1,22 @@
 #include "Canonizer.h"
 
-#include "Temp.h"
+//#include "Temp.h"
 #include <iostream>
 
 void Canonizer::visit(const ExpList* e) {
-	IExp* cur = e->cur;
-	ExpList* others = e->others;
+	const IExp* cur = e->cur;
+	const ExpList* others = e->others;
 
-	cur->accept(this);
-	others->accept(this);
+	//cur->accept(this);
+	//others->accept(this);
 }
 
 void Canonizer::visit(const StmList* e) {
-	IStm* cur = e->cur;
-	StmList* others = e->others;
+	const IStm* cur = e->cur;
+	const StmList* others = e->others;
 
-	cur->accept(this);
-	others->accept(this);
+	//cur->accept(this);
+	//others->accept(this);
 }
 
 void Canonizer::visit(const ConstExp* e) {
@@ -28,78 +28,84 @@ void Canonizer::visit(const NameExp* e) {
 }
 
 void Canonizer::visit(const TempExp* e) {
-	Temp t = e->temp;
+	//Temp t = e->temp;
 }
 
 void Canonizer::visit(const BinopExp* e) {
 	IRTree_OP::OP_BIN op = e->binop;
-	IExp* left = e->left;
-	IExp* right = e->right;
+	const IExp* left = e->left;
+	const IExp* right = e->right;
 
-	left->accept(this);
-	right->accept(this);
+	//left->accept(this);
+	//right->accept(this);s
+
+	//IStm* leftStatements = reorder(left);
+    //IStm* rightStatements = reorder(right);
+   	
+   	//lastEseq.stm = new SeqStm(tree, leftStatements, rightStatements);
+    //lastEseq.exp = node;
 }
 
 void Canonizer::visit(const MemExp* e) {
-	IExp* pointer = e->exp;
+	const IExp* pointer = e->exp;
 	int size = e->size; 
 }
 
 
 void Canonizer::visit(const CallExp* e) {
-	IExp* func = e->func;
+	const IExp* func = e->func;
 	ExpList* args = e->args;
 
-	func->accept(this);
-	args->accept(this);
+	//func->accept(this);
+	//args->accept(this);
 }
 
 void Canonizer::visit(const EseqExp* e) {
-	IStm* stm = e->stm;
-	IExp* exp = e->exp;
+	const IStm* stm = e->stm;
+	const IExp* exp = e->exp;
 
-	stm->accept(this);
-	exp->accept(this);
+	//stm->accept(this);
+	//exp->accept(this);
 }
 
 void Canonizer::visit(const MoveStm* e) {
-	IExp* left = e->left;
-	IExp* right = e->right;
+	const IExp* left = e->left;
+	const IExp* right = e->right;
 
-	left->accept(this);
-	right->accept(this);
+	//left->accept(this);
+	//right->accept(this);
 }
 
 void Canonizer::visit(const ExpStm* e) {
-	IExp* exp = e->exp;
+	const IExp* exp = e->exp;
 
-	exp->accept(this);
+	//exp->accept(this);
 }
 
 void Canonizer::visit(const JumpStm* e) {
-	IExp* exp = e->exp;
+	const IExp* exp = e->exp;
 	std::vector<Label> targets = e->targets; // not necassery
 
-	exp->accept(this);
+	//exp->accept(this);
 }
 
 void Canonizer::visit(const CJumpStm* e) {
 	IRTree_OP::OP_COMPARE op = e->relop;
-	IExp* left = e->left;
-	IExp* right = e->right;
+	const IExp* left = e->left;
+	const IExp* right = e->right;
 	Label iftrue = e->iftrue;
 	Label iffalse = e->iffalse;
 
-	left->accept(this);
-	right->accept(this);
+	//left->accept(this);
+	//right->accept(this);
 }
 
 void Canonizer::visit(const SeqStm* e) {
-	IStm* left = e->left;
-	IStm* right = e->right;
+	const IStm* left = e->left;
+	const IStm* right = e->right;
 
-	left->accept(this);
-	right->accept(this);
+	//left->accept(this);
+	//right->accept(this);
 }
 
 

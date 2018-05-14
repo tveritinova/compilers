@@ -11,6 +11,8 @@ public:
 	Canonizer(const IStm* stm): body(stm) {};
 
 	void visit(const ExpList*) override;
+	void visit(const MemExp*) override;
+	void visit(const ExpStm*) override;
 	void visit(const StmList*) override;
 	void visit(const ConstExp*) override;
 	void visit(const NameExp*) override;
