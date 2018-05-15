@@ -125,6 +125,7 @@ public:
     }
 
     bool IsCommutative() const override { return true; }
+    bool IsAbsolutelyCommutative() const override { return true; }
 };
 
 class NameExp: public IExp {
@@ -148,6 +149,7 @@ public:
     }
 
     bool IsCommutative() const override { return true; }
+    bool IsAbsolutelyCommutative() const override { return true; }
 };
 
 class TempExp : public IExp {

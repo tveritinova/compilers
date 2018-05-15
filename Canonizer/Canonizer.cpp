@@ -71,7 +71,7 @@ void Canonizer::visit(const BinopExp* e) {
 	e->right = right;
 
    	lastEseq->stm = new SeqStm(tree, leftStatements, rightStatements);
-    lastEseq->exp = node;
+    lastEseq->exp = e;
 }
 
 void Canonizer::visit(const MemExp* e) {
@@ -102,30 +102,49 @@ void Canonizer::visit(const MoveStm* e) {
 
 	left->accept(this);
 	right->accept(this);
+
+    IStm* src = reorder(&(e->left));
+    IStm* dst = reorder(&(e->right));
+
+    if (src != nullptr) {
+        lastEseq->stm = addSeqIfRequired(src);
+    }
+    if (dst != nullptr) {
+        lastEseq->stm = addSeqIfRequired(dst);
+    }
+
+    lastEseq->stm = addSeqIfRequired(e);
 }
 
 void Canonizer::visit(const ExpStm* e) {
-	const IExp* exp = e->exp;
 
-	exp->accept(this);
+    IStm* stm = reorder(&(e->exp));
+
+    if (stm != nullptr) {
+        lastEseq->stm = addSeqIfRequired(stm);
+    }
+
+    lastEseq->stm = addSeqIfRequired(e);
 }
 
 void Canonizer::visit(const JumpStm* e) {
-	const IExp* exp = e->exp;
-	std::vector<Label> targets = e->targets; // not necassery
-
-	exp->accept(this);
+    lastEseq->stm = addSeqIfRequired(e);
 }
 
 void Canonizer::visit(const CJumpStm* e) {
-	IRTree_OP::OP_COMPARE op = e->relop;
-	const IExp* left = e->left;
-	const IExp* right = e->right;
-	Label iftrue = e->iftrue;
-	Label iffalse = e->iffalse;
 
-	left->accept(this);
-	right->accept(this);
+	IStm* leftStatements = = reorder(&(e->left));
+	IStm* rightStatements = = reorder(&(e->right));
+
+    if (leftStatements != nullptr) {
+        lastEseq->stm = addSeqIfRequired(leftStatements);
+    }
+
+    if (rightStatements != nullptr) {
+        lastEseq->stm = addSeqIfRequired(rightStatements);
+    }
+
+    lastEseq->stm = addSeqIfRequired(e);
 }
 
 void Canonizer::visit(const SeqStm* e) {
