@@ -10,7 +10,7 @@ public:
 
 	Canonizer(const IStm* stm): body(stm) {};
 
-	const IStm* reorder(const IExp* exp);
+	const IStm* reorder(IExp** exp);
 	void decomposeEseq();
 
 	void visit(const ExpList*) override;

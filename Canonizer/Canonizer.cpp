@@ -5,33 +5,27 @@
 
 
 // поднимает вверх eseq
-const IStm* Canonizer::reorder((const IExp*)* exp)
-{
-
-	//check
+const IStm* Canonizer::reorder(IExp** exp) {
     (*exp)->accept(this);
     decomposeEseq();
     *exp = lastEseq->exp;
     return lastEseq->stm;
 }
 
-void Canonizer::decomposeEseq()
-{
+void Canonizer::decomposeEseq() {
     if (lastEseq->stm == nullptr || lastEseq->exp == nullptr) {
         return;
     }
-    // TODO
-    //if (lastEseq->exp->IsCommutative()) {
-    //    return;
-    //}
 
-    //Temp* holder = new Temp(Temp::TempHolderLocalId); 
+    if (lastEseq->exp->IsCommutative()) {
+        return;
+    }
 
     lastEseq->stm = new SeqStm(tree, lastEseq->stm,
-                                      new MoveStm(tree, 
-                                      	new TempExp(tree, Temp("TempHolderLocalId")), 
+                                      new MoveStm(tree,
+                                      	new TempExp(tree, Temp("TempHolderLocalId")),
                                       	lastEseq->exp));
-    // TODO: 4?
+
     lastEseq->exp = new MemExp(tree, new TempExp(tree, Temp("TempHolderLocalId")), 4);
 }
 
@@ -75,7 +69,7 @@ void Canonizer::visit(const BinopExp* e) {
 
 	e->left = left;
 	e->right = right;
-   	
+
    	lastEseq->stm = new SeqStm(tree, leftStatements, rightStatements);
     lastEseq->exp = node;
 }

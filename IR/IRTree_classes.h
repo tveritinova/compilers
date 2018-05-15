@@ -37,6 +37,8 @@ public:
 	std::string label;
 
 	virtual void accept(IRTreeVisitor* visitor) const = 0;
+	virtual bool IsCommutative() const = 0;
+	virtual bool IsAbsolutelyCommutative() const = 0;
 };
 
 
@@ -66,6 +68,7 @@ public:
 	void accept(IRTreeVisitor* visitor) const {
         visitor->visit(this);
     }
+
 };
 
 
@@ -120,6 +123,8 @@ public:
 	void accept(IRTreeVisitor* visitor) const {
         visitor->visit(this);
     }
+
+    bool IsCommutative() const override { return true; }
 };
 
 class NameExp: public IExp {
@@ -141,6 +146,8 @@ public:
 	void accept(IRTreeVisitor* visitor) const {
         visitor->visit(this);
     }
+
+    bool IsCommutative() const override { return true; }
 };
 
 class TempExp : public IExp {
@@ -163,6 +170,9 @@ public:
 	void accept(IRTreeVisitor* visitor) const {
         visitor->visit(this);
     }
+
+    bool IsCommutative() const override { return true; }
+    bool IsAbsolutelyCommutative() const override { return Temp.tName == "TempHolderLocalId"; }
 };
 
 class BinopExp : public IExp {
@@ -189,6 +199,9 @@ public:
 	void accept(IRTreeVisitor* visitor) const {
         visitor->visit(this);
     }
+
+    bool IsCommutative() const override { return false; }
+    bool IsAbsolutelyCommutative() const override { return false; }
 };
 
 
@@ -216,6 +229,9 @@ public:
 	void accept(IRTreeVisitor* visitor) const {
         visitor->visit(this);
     }
+
+    virtual bool IsCommutative() const override { return exp->IsAbsolutelyCommutative(); }
+    virtual bool IsAbsolutelyCommutative() const override { return false; }
 
 };
 
@@ -249,6 +265,9 @@ public:
 	void accept(IRTreeVisitor* visitor) const {
         visitor->visit(this);
     }
+
+    bool IsCommutative() const override { return false; }
+    bool IsAbsolutelyCommutative() const override { return false; }
 };
 
 
@@ -278,6 +297,9 @@ public:
 	void accept(IRTreeVisitor* visitor) const {
         visitor->visit(this);
     }
+
+    bool IsCommutative() const override { return false; }
+    bool IsAbsolutelyCommutative() const override { return false; }
 };
 
 
