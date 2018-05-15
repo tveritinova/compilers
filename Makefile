@@ -1,11 +1,17 @@
 
-all: parser table irtree
+all: parser table irtree canonizer
 
 irtree: tablevisitor.o Symbol.o MethodInfo.o lex.o parser.o Table.o ClassInfo.o IRTranslate.o X86MiniJavaFrame.o visitor.o tablevisitor.o Canonizer.o
 	g++ -g --std=c++14 -Wno-write-strings irtree_exec.cpp -o irtree Symbol.o MethodInfo.o lex.o parser.o Table.o ClassInfo.o IRTranslate.o X86MiniJavaFrame.o visitor.o typechecker.o Canonizer.o
 
+canonizer: Canonizer.o Linerizer.o
+	g++ -g  --std=c++14 Canonizer/canonizer_run.cpp -o canonizer Canonizer.o Linerizer.o
+
 Canonizer.o:
 	g++ -g --std=c++14 -c Canonizer/Canonizer.cpp -o Canonizer.o
+
+Linerizer.o:
+	g++ -g --std=c++14 -c Canonizer/Linerizer.cpp -o Linerizer.o
 
 IRTranslate.o:
 	g++ -g --std=c++14 -c IR/IRTranslate.cpp -o IRTranslate.o
@@ -50,7 +56,7 @@ visitor.o: AST/treeserializer.cpp
 	g++ -g -c --std=c++14 AST/treeserializer.cpp -o visitor.o
 
 clean:
-	rm  lex.yy.cc bison_code.tab.c bison_code.tab.h lex.o visitor.o parser.o parser Table.o Symbol.o ClassInfo.o MethodInfo.o table_.o tree.o typechecker.o X86MiniJavaFrame.o irtree table IRTranslate.o Canonizer.o
+	rm  lex.yy.cc bison_code.tab.c bison_code.tab.h lex.o visitor.o parser.o parser Table.o Symbol.o ClassInfo.o MethodInfo.o table_.o tree.o typechecker.o X86MiniJavaFrame.o irtree table IRTranslate.o Canonizer.o Linerizer.o  canonizer
 
 
 

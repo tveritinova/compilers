@@ -12,6 +12,7 @@ public:
 
 	const IStm* reorder(IExp** exp);
 	void decomposeEseq();
+	IStm* addSeqIfRequired(IStm* stm);
 
 	void visit(const ExpList*) override;
 	void visit(const MemExp*) override;

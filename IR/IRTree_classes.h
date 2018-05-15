@@ -174,7 +174,7 @@ public:
     }
 
     bool IsCommutative() const override { return true; }
-    bool IsAbsolutelyCommutative() const override { return Temp.tName == "TempHolderLocalId"; }
+    bool IsAbsolutelyCommutative() const override { return temp.tName == "TempHolderLocalId"; }
 };
 
 class BinopExp : public IExp {

@@ -29,6 +29,14 @@ void Canonizer::decomposeEseq() {
     lastEseq->exp = new MemExp(tree, new TempExp(tree, Temp("TempHolderLocalId")), 4);
 }
 
+IStm* Canonizer::addSeqIfRequired(IStm* stm) {
+
+    if (lastEseq->stm == nullptr) {
+        return stm;
+    }
+    return new Seq(tree, lastEseq->stm, stm);
+}
+
 void Canonizer::visit(const ExpList* e) {
 
     if (e->cur != nullptr) {
