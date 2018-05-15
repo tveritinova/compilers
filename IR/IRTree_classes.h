@@ -2,11 +2,44 @@
 #ifndef H_IRCLASSES
 #define H_IRCLASSES
 
+class ExpList;
+class StmList;
+class ConstExp;
+class NameExp;
+class TempExp;
+class BinopExp;
+class CallExp;
+class EseqExp;
+class MoveStm;
+class JumpStm;
+class CJumpStm;
+class SeqStm;
+class LabelStm;
+class ExpStm;
+class MemExp;
+
 #include "IRTree.h"
 #include "Temp.h"
-#include "IStm.h"
-#include "IExp.h"
-#include "Label.h"
+#include "../Canonizer/IRTreeVisitor.h"
+
+
+struct Label {
+	std::string lName;
+	Label(std::string _lName): lName(_lName) { /*std::cout << "init label " << lName << std::endl;*/ }
+};
+
+
+class IExp {
+public:
+	std::string id="";
+	virtual ~IExp() {}
+	virtual void print(IRTree& tree) const= 0;
+	std::string label;
+
+	virtual void accept(IRTreeVisitor* visitor) const = 0;
+	virtual bool IsCommutative() const = 0;
+	virtual bool IsAbsolutelyCommutative() const = 0;
+};
 
 
 class ExpList {
@@ -31,10 +64,25 @@ public:
 			others->print(tree);
 		}
 	}
+
+	void accept(IRTreeVisitor* visitor) const {
+        visitor->visit(this);
+    }
+
 };
 
 
+class IStm {
+public:
+	std::string id = "";
+	virtual ~IStm() {}
+	virtual void print(IRTree& tree) const = 0;
+	std::string label;
 
+
+	virtual void accept(IRTreeVisitor* visitor) const = 0;
+
+};
 
 class StmList {
 public:
@@ -42,6 +90,10 @@ public:
 	const StmList* others;
 
 	StmList(const IStm* _cur, const StmList* _others) : cur(_cur), others(_others) {};
+
+	void accept(IRTreeVisitor* visitor) const {
+        visitor->visit(this);
+    }
 };
 
 
@@ -67,6 +119,13 @@ public:
 			tree.get_tree_name("const_" + std::to_string(value)), 
 			std::to_string(value));
 	}
+
+	void accept(IRTreeVisitor* visitor) const {
+        visitor->visit(this);
+    }
+
+    bool IsCommutative() const override { return true; }
+    bool IsAbsolutelyCommutative() const override { return true; }
 };
 
 class NameExp: public IExp {
@@ -85,6 +144,37 @@ public:
 		std::cout << "end print name exp" << std::endl;
 	}
 
+	void accept(IRTreeVisitor* visitor) const {
+        visitor->visit(this);
+    }
+
+    bool IsCommutative() const override { return true; }
+    bool IsAbsolutelyCommutative() const override { return true; }
+};
+
+class TempExp : public IExp {
+public:
+	Temp temp;
+
+	TempExp(IRTree& tree, Temp _temp): temp(_temp) {
+		//std::cout << "create temp exp" << std::endl;
+		label = "TEMP";
+		id = tree.get_tree_name(label);
+		std::cout << "create temp expr " << id << std::endl;
+	}
+
+	void print(IRTree& tree) const {
+		std::cout << "in print temp exp" << std::endl;
+		std::cout << "000000     " << temp.tName << std::endl;
+		tree.add_record(id, label, tree.get_tree_name(temp.tName), temp.tName);
+	}
+
+	void accept(IRTreeVisitor* visitor) const {
+        visitor->visit(this);
+    }
+
+    bool IsCommutative() const override { return true; }
+    bool IsAbsolutelyCommutative() const override { return Temp.tName == "TempHolderLocalId"; }
 };
 
 class BinopExp : public IExp {
@@ -107,6 +197,43 @@ public:
 		left->print(tree);
 		right->print(tree);
 	}
+
+	void accept(IRTreeVisitor* visitor) const {
+        visitor->visit(this);
+    }
+
+    bool IsCommutative() const override { return false; }
+    bool IsAbsolutelyCommutative() const override { return false; }
+};
+
+
+class MemExp : public IExp {
+public:
+	const IExp* exp; 
+	const int size; 
+
+	MemExp(IRTree& tree, const IExp* _exp, int _size): exp(_exp), size(_size){
+		//std::cout << "create mem exp" << std::endl;
+		label = "MEM";
+		id = tree.get_tree_name(label);
+		std::cout << "create mem expr " << id << std::endl;
+	}
+
+	void print(IRTree& tree) const {
+		std::cout << "in print mem exp" << std::endl;
+		tree.add_record(id, label, exp->id, exp->label);
+		tree.add_record(id, label, 
+			tree.get_tree_name("memzize_" + std::to_string(size)), 
+			std::to_string(size));
+		exp->print(tree);
+	}
+
+	void accept(IRTreeVisitor* visitor) const {
+        visitor->visit(this);
+    }
+
+    virtual bool IsCommutative() const override { return exp->IsAbsolutelyCommutative(); }
+    virtual bool IsAbsolutelyCommutative() const override { return false; }
 
 };
 
@@ -136,6 +263,13 @@ public:
 
 		args->print(tree);
 	}
+
+	void accept(IRTreeVisitor* visitor) const {
+        visitor->visit(this);
+    }
+
+    bool IsCommutative() const override { return false; }
+    bool IsAbsolutelyCommutative() const override { return false; }
 };
 
 
@@ -161,6 +295,13 @@ public:
 		stm->print(tree);
 		exp->print(tree);
 	}
+
+	void accept(IRTreeVisitor* visitor) const {
+        visitor->visit(this);
+    }
+
+    bool IsCommutative() const override { return false; }
+    bool IsAbsolutelyCommutative() const override { return false; }
 };
 
 
@@ -192,6 +333,35 @@ public:
 		left->print(tree);
 		right->print(tree);
 	}
+
+	void accept(IRTreeVisitor* visitor) const {
+        visitor->visit(this);
+    }
+};
+
+
+
+class ExpStm : public IStm {
+public:
+	const IExp* exp;
+
+	ExpStm(IRTree& tree, const IExp* _exp) : exp(_exp) {
+		label = "EXP";
+		id = tree.get_tree_name(label);
+		std::cout << "create exp stmt " << id << std::endl;
+	}
+
+	void print(IRTree& tree) const {
+		std::cout << "in print exp stmnt" << std::endl;
+		//std::cout << exp->id << std::endl;
+		tree.add_record(id, label, exp->id, exp->label);
+		exp->print(tree);
+	}
+
+	void accept(IRTreeVisitor* visitor) const {
+        visitor->visit(this);
+    }
+
 };
 
 
@@ -214,6 +384,10 @@ public:
 			tree.add_record(id, label, tree.get_tree_name(targets[i].lName), targets[i].lName);
 		exp->print(tree);
 	}
+
+	void accept(IRTreeVisitor* visitor) const {
+        visitor->visit(this);
+    }
 };
 
 
@@ -244,6 +418,10 @@ public:
 		left->print(tree);
 		right->print(tree);
 	}
+
+	void accept(IRTreeVisitor* visitor) const {
+        visitor->visit(this);
+    }
 };
 
 
@@ -277,6 +455,10 @@ public:
 			right->print(tree);
 		}
 	}
+
+	void accept(IRTreeVisitor* visitor) const {
+        visitor->visit(this);
+    }
 };
 
 
@@ -295,6 +477,10 @@ public:
 		//std::cout << "() " << label_class.lName << std::endl;
 		tree.add_record(id, label, tree.get_tree_name(label_class.lName), label_class.lName);
 	}
+
+	void accept(IRTreeVisitor* visitor) const {
+        visitor->visit(this);
+    }
 };
 
 #endif
