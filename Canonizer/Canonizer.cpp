@@ -23,85 +23,90 @@ void Canonizer::decomposeEseq() {
 
     lastEseq->stm = new SeqStm(tree, lastEseq->stm,
                                       new MoveStm(tree,
-                                      	new TempExp(tree, Temp("TempHolderLocalId")),
-                                      	lastEseq->exp));
+                                        new TempExp(tree, Temp("TempHolderLocalId")),
+                                        lastEseq->exp));
 
     lastEseq->exp = new MemExp(tree, new TempExp(tree, Temp("TempHolderLocalId")), 4);
 }
 
 void Canonizer::visit(const ExpList* e) {
-	const IExp* cur = e->cur;
-	const ExpList* others = e->others;
 
-	cur->accept(this);
-	others->accept(this);
+    if (e->cur != nullptr) {
+        IStm* stm = reorder(&(e->cur));
+        if (stm != nullptr) {
+            lastEseq->stm = addSeqIfRequired(stm);
+        }
+    }
+
+    if (e->others != nullptr) {
+        e->others->accept(this);
+        e->others = lastEseq->exp;
+    }
+
+    lastEseq->exp = e;
 }
 
-void Canonizer::visit(const StmList* e) {
-	const IStm* cur = e->cur;
-	const StmList* others = e->others;
+/*void Canonizer::visit(const StmList* e) {
 
-	cur->accept(this);
-	others->accept(this);
-}
+    const IStm* cur = e->cur;
+    const StmList* others = e->others;
+
+    cur->accept(this);
+    others->accept(this);
+}*/
 
 void Canonizer::visit(const ConstExp* e) {
-	int v = e->value;
+    lastEseq->exp = exp;
 }
 
 void Canonizer::visit(const NameExp* e) {
-	Label l = e->label_class;
+    lastEseq->exp = exp;
 }
 
 void Canonizer::visit(const TempExp* e) {
-	//Temp t = e->temp;
+    lastEseq->exp = exp;
 }
 
 void Canonizer::visit(const BinopExp* e) {
-	IRTree_OP::OP_BIN op = e->binop;
-	const IExp* left = e->left;
-	const IExp* right = e->right;
 
-	IStm* leftStatements = reorder(left);
-	IStm* rightStatements = reorder(right);
+    IStm* leftStatements = reorder(&(e->left));
+    IStm* rightStatements = reorder(&(e->right));
 
-	// check left change
-
-	e->left = left;
-	e->right = right;
-
-   	lastEseq->stm = new SeqStm(tree, leftStatements, rightStatements);
+    lastEseq->stm = new SeqStm(tree, leftStatements, rightStatements);
     lastEseq->exp = e;
 }
 
 void Canonizer::visit(const MemExp* e) {
-	const IExp* pointer = e->exp;
-	int size = e->size; 
+    const IExp* pointer = e->exp;
+    int size = e->size;
+
+    e->exp->accept(this);
+    e->exp = lastEseq->exp;
+    lastEseq->exp = e;
 }
 
 
 void Canonizer::visit(const CallExp* e) {
-	const IExp* func = e->func;
-	ExpList* args = e->args;
+    const IExp* func = e->func;
+    ExpList* args = e->args;
 
-	func->accept(this);
-	args->accept(this);
+    e->args->accept(this);
+    e->args = new ExpList(lastEseq->exp, nullptr);
+    lastEseq->stm = reorder(&(e->func));
+    lastEseq->exp = e;
 }
 
 void Canonizer::visit(const EseqExp* e) {
-	const IStm* stm = e->stm;
-	const IExp* exp = e->exp;
 
-	stm->accept(this);
-	exp->accept(this);
+    e->stm->accept(this);
+    lastEseq->stm = reorder(&(e->exp));
+    lastEseq->exp = e->exp;
 }
 
 void Canonizer::visit(const MoveStm* e) {
-	const IExp* left = e->left;
-	const IExp* right = e->right;
+    const IExp* left = e->left;
+    const IExp* right = e->right;
 
-	left->accept(this);
-	right->accept(this);
 
     IStm* src = reorder(&(e->left));
     IStm* dst = reorder(&(e->right));
@@ -133,8 +138,8 @@ void Canonizer::visit(const JumpStm* e) {
 
 void Canonizer::visit(const CJumpStm* e) {
 
-	IStm* leftStatements = = reorder(&(e->left));
-	IStm* rightStatements = = reorder(&(e->right));
+    IStm* leftStatements = = reorder(&(e->left));
+    IStm* rightStatements = = reorder(&(e->right));
 
     if (leftStatements != nullptr) {
         lastEseq->stm = addSeqIfRequired(leftStatements);
@@ -148,13 +153,9 @@ void Canonizer::visit(const CJumpStm* e) {
 }
 
 void Canonizer::visit(const SeqStm* e) {
-	const IStm* left = e->left;
-	const IStm* right = e->right;
+    const IStm* left = e->left;
+    const IStm* right = e->right;
 
-	left->accept(this);
-	right->accept(this);
+    left->accept(this);
+    right->accept(this);
 }
-
-
-
-
