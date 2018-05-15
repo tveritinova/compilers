@@ -10,6 +10,9 @@ public:
 
 	Canonizer(const IStm* stm): body(stm) {};
 
+	const IStm* reorder(const IExp* exp);
+	void decomposeEseq();
+
 	void visit(const ExpList*) override;
 	void visit(const MemExp*) override;
 	void visit(const ExpStm*) override;
@@ -25,4 +28,8 @@ public:
 	void visit(const CJumpStm*) override;
 	void visit(const SeqStm*) override;
 	void visit(const LabelStm*) override {}
+
+	EseqExp* lastEseq;
+
+	IRTree tree;
 };

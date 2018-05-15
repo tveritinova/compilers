@@ -1,7 +1,39 @@
 #include "Canonizer.h"
 
-//#include "Temp.h"
+#include "../IR/Temp.h"
 #include <iostream>
+
+
+// поднимает вверх eseq
+const IStm* Canonizer::reorder((const IExp*)* exp)
+{
+
+	//check
+    (*exp)->accept(this);
+    decomposeEseq();
+    *exp = lastEseq->exp;
+    return lastEseq->stm;
+}
+
+void Canonizer::decomposeEseq()
+{
+    if (lastEseq->stm == nullptr || lastEseq->exp == nullptr) {
+        return;
+    }
+    // TODO
+    //if (lastEseq->exp->IsCommutative()) {
+    //    return;
+    //}
+
+    //Temp* holder = new Temp(Temp::TempHolderLocalId); 
+
+    lastEseq->stm = new SeqStm(tree, lastEseq->stm,
+                                      new MoveStm(tree, 
+                                      	new TempExp(tree, Temp("TempHolderLocalId")), 
+                                      	lastEseq->exp));
+    // TODO: 4?
+    lastEseq->exp = new MemExp(tree, new TempExp(tree, Temp("TempHolderLocalId")), 4);
+}
 
 void Canonizer::visit(const ExpList* e) {
 	const IExp* cur = e->cur;
@@ -36,14 +68,16 @@ void Canonizer::visit(const BinopExp* e) {
 	const IExp* left = e->left;
 	const IExp* right = e->right;
 
-	left->accept(this);
-	right->accept(this);
+	IStm* leftStatements = reorder(left);
+	IStm* rightStatements = reorder(right);
 
-	//IStm* leftStatements = reorder(left);
-    //IStm* rightStatements = reorder(right);
+	// check left change
+
+	e->left = left;
+	e->right = right;
    	
-   	//lastEseq.stm = new SeqStm(tree, leftStatements, rightStatements);
-    //lastEseq.exp = node;
+   	lastEseq->stm = new SeqStm(tree, leftStatements, rightStatements);
+    lastEseq->exp = node;
 }
 
 void Canonizer::visit(const MemExp* e) {
