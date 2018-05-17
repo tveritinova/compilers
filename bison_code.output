@@ -1,4 +1,4 @@
-Terminals which are not used
+Terminals unused in grammar
 
    OR
 
@@ -15,10 +15,10 @@ Grammar
     4          | CLASS id extends_block BTBR_L method_list BTBR_R
 
     5 class_dec_list: class_dec_list class_dec
-    6               | /* empty */
+    6               | %empty
 
     7 extends_block: EXTENDS id
-    8              | /* empty */
+    8              | %empty
 
     9 var_dec: type id SEMICOLON
 
@@ -31,11 +31,11 @@ Grammar
    15       | PUBLIC type id RNDBR_L arglist RNDBR_R BTBR_L RETURN expression SEMICOLON BTBR_R
 
    16 method_list: method_list method
-   17            | /* empty */
+   17            | %empty
 
    18 arglist: arglist COMMA type id
    19        | type id
-   20        | /* empty */
+   20        | %empty
 
    21 stmnt_list: stmnt_list statement
    22           | statement
@@ -71,10 +71,10 @@ Grammar
    49           | RNDBR_L expression RNDBR_R
 
    50 expression_list: expression expression_add
-   51                | /* empty */
+   51                | %empty
 
    52 expression_add: expression_add COMMA expression
-   53               | /* empty */
+   53               | %empty
 
    54 id: ID
 
@@ -152,9 +152,9 @@ type (51)
 statement (52)
     on left: 27 28 29 30 31 32, on right: 2 21 22 28 29
 expression (53)
-    on left: 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49,
-    on right: 12 13 14 15 28 29 30 31 32 33 34 35 36 37 38 39 40 46
-    48 49 50 52
+    on left: 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49, on right:
+    12 13 14 15 28 29 30 31 32 33 34 35 36 37 38 39 40 46 48 49 50
+    52
 expression_list (54)
     on left: 50 51, on right: 40
 expression_add (55)
@@ -164,7 +164,7 @@ id (56)
     44 47
 
 
-state 0
+State 0
 
     0 $accept: . goal END
 
@@ -174,7 +174,7 @@ state 0
     main_class  go to state 3
 
 
-state 1
+State 1
 
     2 main_class: CLASS . id BTBR_L PUBLIC MAIN RNDBR_L STRING SQBR_L SQBR_R id RNDBR_R BTBR_L statement BTBR_R BTBR_R
 
@@ -183,14 +183,14 @@ state 1
     id  go to state 5
 
 
-state 2
+State 2
 
     0 $accept: goal . END
 
     END  shift, and go to state 6
 
 
-state 3
+State 3
 
     1 goal: main_class . class_dec_list
 
@@ -199,28 +199,28 @@ state 3
     class_dec_list  go to state 7
 
 
-state 4
+State 4
 
    54 id: ID .
 
     $default  reduce using rule 54 (id)
 
 
-state 5
+State 5
 
     2 main_class: CLASS id . BTBR_L PUBLIC MAIN RNDBR_L STRING SQBR_L SQBR_R id RNDBR_R BTBR_L statement BTBR_R BTBR_R
 
     BTBR_L  shift, and go to state 8
 
 
-state 6
+State 6
 
     0 $accept: goal END .
 
     $default  accept
 
 
-state 7
+State 7
 
     1 goal: main_class class_dec_list .
     5 class_dec_list: class_dec_list . class_dec
@@ -232,14 +232,14 @@ state 7
     class_dec  go to state 10
 
 
-state 8
+State 8
 
     2 main_class: CLASS id BTBR_L . PUBLIC MAIN RNDBR_L STRING SQBR_L SQBR_R id RNDBR_R BTBR_L statement BTBR_R BTBR_R
 
     PUBLIC  shift, and go to state 11
 
 
-state 9
+State 9
 
     3 class_dec: CLASS . id extends_block BTBR_L var_dec_list method_list BTBR_R
     4          | CLASS . id extends_block BTBR_L method_list BTBR_R
@@ -249,21 +249,21 @@ state 9
     id  go to state 12
 
 
-state 10
+State 10
 
     5 class_dec_list: class_dec_list class_dec .
 
     $default  reduce using rule 5 (class_dec_list)
 
 
-state 11
+State 11
 
     2 main_class: CLASS id BTBR_L PUBLIC . MAIN RNDBR_L STRING SQBR_L SQBR_R id RNDBR_R BTBR_L statement BTBR_R BTBR_R
 
     MAIN  shift, and go to state 13
 
 
-state 12
+State 12
 
     3 class_dec: CLASS id . extends_block BTBR_L var_dec_list method_list BTBR_R
     4          | CLASS id . extends_block BTBR_L method_list BTBR_R
@@ -275,14 +275,14 @@ state 12
     extends_block  go to state 15
 
 
-state 13
+State 13
 
     2 main_class: CLASS id BTBR_L PUBLIC MAIN . RNDBR_L STRING SQBR_L SQBR_R id RNDBR_R BTBR_L statement BTBR_R BTBR_R
 
     RNDBR_L  shift, and go to state 16
 
 
-state 14
+State 14
 
     7 extends_block: EXTENDS . id
 
@@ -291,7 +291,7 @@ state 14
     id  go to state 17
 
 
-state 15
+State 15
 
     3 class_dec: CLASS id extends_block . BTBR_L var_dec_list method_list BTBR_R
     4          | CLASS id extends_block . BTBR_L method_list BTBR_R
@@ -299,21 +299,21 @@ state 15
     BTBR_L  shift, and go to state 18
 
 
-state 16
+State 16
 
     2 main_class: CLASS id BTBR_L PUBLIC MAIN RNDBR_L . STRING SQBR_L SQBR_R id RNDBR_R BTBR_L statement BTBR_R BTBR_R
 
     STRING  shift, and go to state 19
 
 
-state 17
+State 17
 
     7 extends_block: EXTENDS id .
 
     $default  reduce using rule 7 (extends_block)
 
 
-state 18
+State 18
 
     3 class_dec: CLASS id extends_block BTBR_L . var_dec_list method_list BTBR_R
     4          | CLASS id extends_block BTBR_L . method_list BTBR_R
@@ -331,14 +331,14 @@ state 18
     id            go to state 26
 
 
-state 19
+State 19
 
     2 main_class: CLASS id BTBR_L PUBLIC MAIN RNDBR_L STRING . SQBR_L SQBR_R id RNDBR_R BTBR_L statement BTBR_R BTBR_R
 
     SQBR_L  shift, and go to state 27
 
 
-state 20
+State 20
 
    23 type: INT . SQBR_L SQBR_R
    25     | INT .
@@ -348,21 +348,21 @@ state 20
     $default  reduce using rule 25 (type)
 
 
-state 21
+State 21
 
    24 type: BOOL .
 
     $default  reduce using rule 24 (type)
 
 
-state 22
+State 22
 
    11 var_dec_list: var_dec .
 
     $default  reduce using rule 11 (var_dec_list)
 
 
-state 23
+State 23
 
     3 class_dec: CLASS id extends_block BTBR_L var_dec_list . method_list BTBR_R
    10 var_dec_list: var_dec_list . var_dec
@@ -379,7 +379,7 @@ state 23
     id           go to state 26
 
 
-state 24
+State 24
 
     4 class_dec: CLASS id extends_block BTBR_L method_list . BTBR_R
    16 method_list: method_list . method
@@ -390,7 +390,7 @@ state 24
     method  go to state 33
 
 
-state 25
+State 25
 
     9 var_dec: type . id SEMICOLON
 
@@ -399,35 +399,35 @@ state 25
     id  go to state 34
 
 
-state 26
+State 26
 
    26 type: id .
 
     $default  reduce using rule 26 (type)
 
 
-state 27
+State 27
 
     2 main_class: CLASS id BTBR_L PUBLIC MAIN RNDBR_L STRING SQBR_L . SQBR_R id RNDBR_R BTBR_L statement BTBR_R BTBR_R
 
     SQBR_R  shift, and go to state 35
 
 
-state 28
+State 28
 
    23 type: INT SQBR_L . SQBR_R
 
     SQBR_R  shift, and go to state 36
 
 
-state 29
+State 29
 
    10 var_dec_list: var_dec_list var_dec .
 
     $default  reduce using rule 10 (var_dec_list)
 
 
-state 30
+State 30
 
     3 class_dec: CLASS id extends_block BTBR_L var_dec_list method_list . BTBR_R
    16 method_list: method_list . method
@@ -438,7 +438,7 @@ state 30
     method  go to state 33
 
 
-state 31
+State 31
 
    12 method: PUBLIC . type id RNDBR_L arglist RNDBR_R BTBR_L var_dec_list stmnt_list RETURN expression SEMICOLON BTBR_R
    13       | PUBLIC . type id RNDBR_L arglist RNDBR_R BTBR_L stmnt_list RETURN expression SEMICOLON BTBR_R
@@ -453,28 +453,28 @@ state 31
     id    go to state 26
 
 
-state 32
+State 32
 
     4 class_dec: CLASS id extends_block BTBR_L method_list BTBR_R .
 
     $default  reduce using rule 4 (class_dec)
 
 
-state 33
+State 33
 
    16 method_list: method_list method .
 
     $default  reduce using rule 16 (method_list)
 
 
-state 34
+State 34
 
     9 var_dec: type id . SEMICOLON
 
     SEMICOLON  shift, and go to state 39
 
 
-state 35
+State 35
 
     2 main_class: CLASS id BTBR_L PUBLIC MAIN RNDBR_L STRING SQBR_L SQBR_R . id RNDBR_R BTBR_L statement BTBR_R BTBR_R
 
@@ -483,21 +483,21 @@ state 35
     id  go to state 40
 
 
-state 36
+State 36
 
    23 type: INT SQBR_L SQBR_R .
 
     $default  reduce using rule 23 (type)
 
 
-state 37
+State 37
 
     3 class_dec: CLASS id extends_block BTBR_L var_dec_list method_list BTBR_R .
 
     $default  reduce using rule 3 (class_dec)
 
 
-state 38
+State 38
 
    12 method: PUBLIC type . id RNDBR_L arglist RNDBR_R BTBR_L var_dec_list stmnt_list RETURN expression SEMICOLON BTBR_R
    13       | PUBLIC type . id RNDBR_L arglist RNDBR_R BTBR_L stmnt_list RETURN expression SEMICOLON BTBR_R
@@ -509,21 +509,21 @@ state 38
     id  go to state 41
 
 
-state 39
+State 39
 
     9 var_dec: type id SEMICOLON .
 
     $default  reduce using rule 9 (var_dec)
 
 
-state 40
+State 40
 
     2 main_class: CLASS id BTBR_L PUBLIC MAIN RNDBR_L STRING SQBR_L SQBR_R id . RNDBR_R BTBR_L statement BTBR_R BTBR_R
 
     RNDBR_R  shift, and go to state 42
 
 
-state 41
+State 41
 
    12 method: PUBLIC type id . RNDBR_L arglist RNDBR_R BTBR_L var_dec_list stmnt_list RETURN expression SEMICOLON BTBR_R
    13       | PUBLIC type id . RNDBR_L arglist RNDBR_R BTBR_L stmnt_list RETURN expression SEMICOLON BTBR_R
@@ -533,14 +533,14 @@ state 41
     RNDBR_L  shift, and go to state 43
 
 
-state 42
+State 42
 
     2 main_class: CLASS id BTBR_L PUBLIC MAIN RNDBR_L STRING SQBR_L SQBR_R id RNDBR_R . BTBR_L statement BTBR_R BTBR_R
 
     BTBR_L  shift, and go to state 44
 
 
-state 43
+State 43
 
    12 method: PUBLIC type id RNDBR_L . arglist RNDBR_R BTBR_L var_dec_list stmnt_list RETURN expression SEMICOLON BTBR_R
    13       | PUBLIC type id RNDBR_L . arglist RNDBR_R BTBR_L stmnt_list RETURN expression SEMICOLON BTBR_R
@@ -558,7 +558,7 @@ state 43
     id       go to state 26
 
 
-state 44
+State 44
 
     2 main_class: CLASS id BTBR_L PUBLIC MAIN RNDBR_L STRING SQBR_L SQBR_R id RNDBR_R BTBR_L . statement BTBR_R BTBR_R
 
@@ -572,7 +572,7 @@ state 44
     id         go to state 52
 
 
-state 45
+State 45
 
    12 method: PUBLIC type id RNDBR_L arglist . RNDBR_R BTBR_L var_dec_list stmnt_list RETURN expression SEMICOLON BTBR_R
    13       | PUBLIC type id RNDBR_L arglist . RNDBR_R BTBR_L stmnt_list RETURN expression SEMICOLON BTBR_R
@@ -584,7 +584,7 @@ state 45
     COMMA    shift, and go to state 54
 
 
-state 46
+State 46
 
    19 arglist: type . id
 
@@ -593,21 +593,21 @@ state 46
     id  go to state 55
 
 
-state 47
+State 47
 
    28 statement: IF . RNDBR_L expression RNDBR_R statement ELSE statement
 
     RNDBR_L  shift, and go to state 56
 
 
-state 48
+State 48
 
    29 statement: WHILE . RNDBR_L expression RNDBR_R statement
 
     RNDBR_L  shift, and go to state 57
 
 
-state 49
+State 49
 
    27 statement: BTBR_L . stmnt_list BTBR_R
 
@@ -622,21 +622,21 @@ state 49
     id          go to state 52
 
 
-state 50
+State 50
 
    30 statement: PRINT . RNDBR_L expression RNDBR_R SEMICOLON
 
     RNDBR_L  shift, and go to state 60
 
 
-state 51
+State 51
 
     2 main_class: CLASS id BTBR_L PUBLIC MAIN RNDBR_L STRING SQBR_L SQBR_R id RNDBR_R BTBR_L statement . BTBR_R BTBR_R
 
     BTBR_R  shift, and go to state 61
 
 
-state 52
+State 52
 
    31 statement: id . EQ expression SEMICOLON
    32          | id . SQBR_L expression SQBR_R EQ expression SEMICOLON
@@ -645,7 +645,7 @@ state 52
     EQ      shift, and go to state 63
 
 
-state 53
+State 53
 
    12 method: PUBLIC type id RNDBR_L arglist RNDBR_R . BTBR_L var_dec_list stmnt_list RETURN expression SEMICOLON BTBR_R
    13       | PUBLIC type id RNDBR_L arglist RNDBR_R . BTBR_L stmnt_list RETURN expression SEMICOLON BTBR_R
@@ -655,7 +655,7 @@ state 53
     BTBR_L  shift, and go to state 64
 
 
-state 54
+State 54
 
    18 arglist: arglist COMMA . type id
 
@@ -667,14 +667,14 @@ state 54
     id    go to state 26
 
 
-state 55
+State 55
 
    19 arglist: type id .
 
     $default  reduce using rule 19 (arglist)
 
 
-state 56
+State 56
 
    28 statement: IF RNDBR_L . expression RNDBR_R statement ELSE statement
 
@@ -691,7 +691,7 @@ state 56
     id          go to state 74
 
 
-state 57
+State 57
 
    29 statement: WHILE RNDBR_L . expression RNDBR_R statement
 
@@ -708,7 +708,7 @@ state 57
     id          go to state 74
 
 
-state 58
+State 58
 
    21 stmnt_list: stmnt_list . statement
    27 statement: BTBR_L stmnt_list . BTBR_R
@@ -724,14 +724,14 @@ state 58
     id         go to state 52
 
 
-state 59
+State 59
 
    22 stmnt_list: statement .
 
     $default  reduce using rule 22 (stmnt_list)
 
 
-state 60
+State 60
 
    30 statement: PRINT RNDBR_L . expression RNDBR_R SEMICOLON
 
@@ -748,14 +748,14 @@ state 60
     id          go to state 74
 
 
-state 61
+State 61
 
     2 main_class: CLASS id BTBR_L PUBLIC MAIN RNDBR_L STRING SQBR_L SQBR_R id RNDBR_R BTBR_L statement BTBR_R . BTBR_R
 
     BTBR_R  shift, and go to state 79
 
 
-state 62
+State 62
 
    32 statement: id SQBR_L . expression SQBR_R EQ expression SEMICOLON
 
@@ -772,7 +772,7 @@ state 62
     id          go to state 74
 
 
-state 63
+State 63
 
    31 statement: id EQ . expression SEMICOLON
 
@@ -789,7 +789,7 @@ state 63
     id          go to state 74
 
 
-state 64
+State 64
 
    12 method: PUBLIC type id RNDBR_L arglist RNDBR_R BTBR_L . var_dec_list stmnt_list RETURN expression SEMICOLON BTBR_R
    13       | PUBLIC type id RNDBR_L arglist RNDBR_R BTBR_L . stmnt_list RETURN expression SEMICOLON BTBR_R
@@ -813,7 +813,7 @@ state 64
     id            go to state 85
 
 
-state 65
+State 65
 
    18 arglist: arglist COMMA type . id
 
@@ -822,14 +822,14 @@ state 65
     id  go to state 86
 
 
-state 66
+State 66
 
    45 expression: THIS .
 
     $default  reduce using rule 45 (expression)
 
 
-state 67
+State 67
 
    46 expression: NEW . INT SQBR_L expression SQBR_R
    47           | NEW . id RNDBR_L RNDBR_R
@@ -840,7 +840,7 @@ state 67
     id  go to state 88
 
 
-state 68
+State 68
 
    49 expression: RNDBR_L . expression RNDBR_R
 
@@ -857,7 +857,7 @@ state 68
     id          go to state 74
 
 
-state 69
+State 69
 
    48 expression: EXCL . expression
 
@@ -874,28 +874,28 @@ state 69
     id          go to state 74
 
 
-state 70
+State 70
 
    43 expression: FALSE .
 
     $default  reduce using rule 43 (expression)
 
 
-state 71
+State 71
 
    42 expression: TRUE .
 
     $default  reduce using rule 42 (expression)
 
 
-state 72
+State 72
 
    41 expression: NUM .
 
     $default  reduce using rule 41 (expression)
 
 
-state 73
+State 73
 
    28 statement: IF RNDBR_L expression . RNDBR_R statement ELSE statement
    33 expression: expression . AND expression
@@ -917,14 +917,14 @@ state 73
     LESS     shift, and go to state 98
 
 
-state 74
+State 74
 
    44 expression: id .
 
     $default  reduce using rule 44 (expression)
 
 
-state 75
+State 75
 
    29 statement: WHILE RNDBR_L expression . RNDBR_R statement
    33 expression: expression . AND expression
@@ -946,21 +946,21 @@ state 75
     LESS     shift, and go to state 98
 
 
-state 76
+State 76
 
    27 statement: BTBR_L stmnt_list BTBR_R .
 
     $default  reduce using rule 27 (statement)
 
 
-state 77
+State 77
 
    21 stmnt_list: stmnt_list statement .
 
     $default  reduce using rule 21 (stmnt_list)
 
 
-state 78
+State 78
 
    30 statement: PRINT RNDBR_L expression . RNDBR_R SEMICOLON
    33 expression: expression . AND expression
@@ -982,14 +982,14 @@ state 78
     LESS     shift, and go to state 98
 
 
-state 79
+State 79
 
     2 main_class: CLASS id BTBR_L PUBLIC MAIN RNDBR_L STRING SQBR_L SQBR_R id RNDBR_R BTBR_L statement BTBR_R BTBR_R .
 
     $default  reduce using rule 2 (main_class)
 
 
-state 80
+State 80
 
    32 statement: id SQBR_L expression . SQBR_R EQ expression SEMICOLON
    33 expression: expression . AND expression
@@ -1011,7 +1011,7 @@ state 80
     LESS    shift, and go to state 98
 
 
-state 81
+State 81
 
    31 statement: id EQ expression . SEMICOLON
    33 expression: expression . AND expression
@@ -1033,7 +1033,7 @@ state 81
     LESS       shift, and go to state 98
 
 
-state 82
+State 82
 
    15 method: PUBLIC type id RNDBR_L arglist RNDBR_R BTBR_L RETURN . expression SEMICOLON BTBR_R
 
@@ -1050,7 +1050,7 @@ state 82
     id          go to state 74
 
 
-state 83
+State 83
 
    10 var_dec_list: var_dec_list . var_dec
    12 method: PUBLIC type id RNDBR_L arglist RNDBR_R BTBR_L var_dec_list . stmnt_list RETURN expression SEMICOLON BTBR_R
@@ -1072,7 +1072,7 @@ state 83
     id          go to state 85
 
 
-state 84
+State 84
 
    13 method: PUBLIC type id RNDBR_L arglist RNDBR_R BTBR_L stmnt_list . RETURN expression SEMICOLON BTBR_R
    21 stmnt_list: stmnt_list . statement
@@ -1088,7 +1088,7 @@ state 84
     id         go to state 52
 
 
-state 85
+State 85
 
    26 type: id .
    31 statement: id . EQ expression SEMICOLON
@@ -1100,28 +1100,28 @@ state 85
     $default  reduce using rule 26 (type)
 
 
-state 86
+State 86
 
    18 arglist: arglist COMMA type id .
 
     $default  reduce using rule 18 (arglist)
 
 
-state 87
+State 87
 
    46 expression: NEW INT . SQBR_L expression SQBR_R
 
     SQBR_L  shift, and go to state 107
 
 
-state 88
+State 88
 
    47 expression: NEW id . RNDBR_L RNDBR_R
 
     RNDBR_L  shift, and go to state 108
 
 
-state 89
+State 89
 
    33 expression: expression . AND expression
    34           | expression . LESS expression
@@ -1143,7 +1143,7 @@ state 89
     LESS     shift, and go to state 98
 
 
-state 90
+State 90
 
    33 expression: expression . AND expression
    34           | expression . LESS expression
@@ -1158,7 +1158,7 @@ state 90
     $default  reduce using rule 48 (expression)
 
 
-state 91
+State 91
 
    38 expression: expression SQBR_L . expression SQBR_R
 
@@ -1175,7 +1175,7 @@ state 91
     id          go to state 74
 
 
-state 92
+State 92
 
    28 statement: IF RNDBR_L expression RNDBR_R . statement ELSE statement
 
@@ -1189,7 +1189,7 @@ state 92
     id         go to state 52
 
 
-state 93
+State 93
 
    39 expression: expression DOT . LEN
    40           | expression DOT . id RNDBR_L expression_list RNDBR_R
@@ -1200,7 +1200,7 @@ state 93
     id  go to state 113
 
 
-state 94
+State 94
 
    33 expression: expression AND . expression
 
@@ -1217,7 +1217,7 @@ state 94
     id          go to state 74
 
 
-state 95
+State 95
 
    35 expression: expression PLUS . expression
 
@@ -1234,7 +1234,7 @@ state 95
     id          go to state 74
 
 
-state 96
+State 96
 
    36 expression: expression MINUS . expression
 
@@ -1251,7 +1251,7 @@ state 96
     id          go to state 74
 
 
-state 97
+State 97
 
    37 expression: expression STAR . expression
 
@@ -1268,7 +1268,7 @@ state 97
     id          go to state 74
 
 
-state 98
+State 98
 
    34 expression: expression LESS . expression
 
@@ -1285,7 +1285,7 @@ state 98
     id          go to state 74
 
 
-state 99
+State 99
 
    29 statement: WHILE RNDBR_L expression RNDBR_R . statement
 
@@ -1299,28 +1299,28 @@ state 99
     id         go to state 52
 
 
-state 100
+State 100
 
    30 statement: PRINT RNDBR_L expression RNDBR_R . SEMICOLON
 
     SEMICOLON  shift, and go to state 120
 
 
-state 101
+State 101
 
    32 statement: id SQBR_L expression SQBR_R . EQ expression SEMICOLON
 
     EQ  shift, and go to state 121
 
 
-state 102
+State 102
 
    31 statement: id EQ expression SEMICOLON .
 
     $default  reduce using rule 31 (statement)
 
 
-state 103
+State 103
 
    15 method: PUBLIC type id RNDBR_L arglist RNDBR_R BTBR_L RETURN expression . SEMICOLON BTBR_R
    33 expression: expression . AND expression
@@ -1342,7 +1342,7 @@ state 103
     LESS       shift, and go to state 98
 
 
-state 104
+State 104
 
    14 method: PUBLIC type id RNDBR_L arglist RNDBR_R BTBR_L var_dec_list RETURN . expression SEMICOLON BTBR_R
 
@@ -1359,7 +1359,7 @@ state 104
     id          go to state 74
 
 
-state 105
+State 105
 
    12 method: PUBLIC type id RNDBR_L arglist RNDBR_R BTBR_L var_dec_list stmnt_list . RETURN expression SEMICOLON BTBR_R
    21 stmnt_list: stmnt_list . statement
@@ -1375,7 +1375,7 @@ state 105
     id         go to state 52
 
 
-state 106
+State 106
 
    13 method: PUBLIC type id RNDBR_L arglist RNDBR_R BTBR_L stmnt_list RETURN . expression SEMICOLON BTBR_R
 
@@ -1392,7 +1392,7 @@ state 106
     id          go to state 74
 
 
-state 107
+State 107
 
    46 expression: NEW INT SQBR_L . expression SQBR_R
 
@@ -1409,21 +1409,21 @@ state 107
     id          go to state 74
 
 
-state 108
+State 108
 
    47 expression: NEW id RNDBR_L . RNDBR_R
 
     RNDBR_R  shift, and go to state 127
 
 
-state 109
+State 109
 
    49 expression: RNDBR_L expression RNDBR_R .
 
     $default  reduce using rule 49 (expression)
 
 
-state 110
+State 110
 
    33 expression: expression . AND expression
    34           | expression . LESS expression
@@ -1445,28 +1445,28 @@ state 110
     LESS    shift, and go to state 98
 
 
-state 111
+State 111
 
    28 statement: IF RNDBR_L expression RNDBR_R statement . ELSE statement
 
     ELSE  shift, and go to state 129
 
 
-state 112
+State 112
 
    39 expression: expression DOT LEN .
 
     $default  reduce using rule 39 (expression)
 
 
-state 113
+State 113
 
    40 expression: expression DOT id . RNDBR_L expression_list RNDBR_R
 
     RNDBR_L  shift, and go to state 130
 
 
-state 114
+State 114
 
    33 expression: expression . AND expression
    33           | expression AND expression .
@@ -1490,7 +1490,7 @@ state 114
     $default  reduce using rule 33 (expression)
 
 
-state 115
+State 115
 
    33 expression: expression . AND expression
    34           | expression . LESS expression
@@ -1509,7 +1509,7 @@ state 115
     $default  reduce using rule 35 (expression)
 
 
-state 116
+State 116
 
    33 expression: expression . AND expression
    34           | expression . LESS expression
@@ -1528,7 +1528,7 @@ state 116
     $default  reduce using rule 36 (expression)
 
 
-state 117
+State 117
 
    33 expression: expression . AND expression
    34           | expression . LESS expression
@@ -1546,7 +1546,7 @@ state 117
     $default  reduce using rule 37 (expression)
 
 
-state 118
+State 118
 
    33 expression: expression . AND expression
    34           | expression . LESS expression
@@ -1569,21 +1569,21 @@ state 118
     $default  reduce using rule 34 (expression)
 
 
-state 119
+State 119
 
    29 statement: WHILE RNDBR_L expression RNDBR_R statement .
 
     $default  reduce using rule 29 (statement)
 
 
-state 120
+State 120
 
    30 statement: PRINT RNDBR_L expression RNDBR_R SEMICOLON .
 
     $default  reduce using rule 30 (statement)
 
 
-state 121
+State 121
 
    32 statement: id SQBR_L expression SQBR_R EQ . expression SEMICOLON
 
@@ -1600,14 +1600,14 @@ state 121
     id          go to state 74
 
 
-state 122
+State 122
 
    15 method: PUBLIC type id RNDBR_L arglist RNDBR_R BTBR_L RETURN expression SEMICOLON . BTBR_R
 
     BTBR_R  shift, and go to state 132
 
 
-state 123
+State 123
 
    14 method: PUBLIC type id RNDBR_L arglist RNDBR_R BTBR_L var_dec_list RETURN expression . SEMICOLON BTBR_R
    33 expression: expression . AND expression
@@ -1629,7 +1629,7 @@ state 123
     LESS       shift, and go to state 98
 
 
-state 124
+State 124
 
    12 method: PUBLIC type id RNDBR_L arglist RNDBR_R BTBR_L var_dec_list stmnt_list RETURN . expression SEMICOLON BTBR_R
 
@@ -1646,7 +1646,7 @@ state 124
     id          go to state 74
 
 
-state 125
+State 125
 
    13 method: PUBLIC type id RNDBR_L arglist RNDBR_R BTBR_L stmnt_list RETURN expression . SEMICOLON BTBR_R
    33 expression: expression . AND expression
@@ -1668,7 +1668,7 @@ state 125
     LESS       shift, and go to state 98
 
 
-state 126
+State 126
 
    33 expression: expression . AND expression
    34           | expression . LESS expression
@@ -1690,21 +1690,21 @@ state 126
     LESS    shift, and go to state 98
 
 
-state 127
+State 127
 
    47 expression: NEW id RNDBR_L RNDBR_R .
 
     $default  reduce using rule 47 (expression)
 
 
-state 128
+State 128
 
    38 expression: expression SQBR_L expression SQBR_R .
 
     $default  reduce using rule 38 (expression)
 
 
-state 129
+State 129
 
    28 statement: IF RNDBR_L expression RNDBR_R statement ELSE . statement
 
@@ -1718,7 +1718,7 @@ state 129
     id         go to state 52
 
 
-state 130
+State 130
 
    40 expression: expression DOT id RNDBR_L . expression_list RNDBR_R
 
@@ -1738,7 +1738,7 @@ state 130
     id               go to state 74
 
 
-state 131
+State 131
 
    32 statement: id SQBR_L expression SQBR_R EQ expression . SEMICOLON
    33 expression: expression . AND expression
@@ -1760,21 +1760,21 @@ state 131
     LESS       shift, and go to state 98
 
 
-state 132
+State 132
 
    15 method: PUBLIC type id RNDBR_L arglist RNDBR_R BTBR_L RETURN expression SEMICOLON BTBR_R .
 
     $default  reduce using rule 15 (method)
 
 
-state 133
+State 133
 
    14 method: PUBLIC type id RNDBR_L arglist RNDBR_R BTBR_L var_dec_list RETURN expression SEMICOLON . BTBR_R
 
     BTBR_R  shift, and go to state 141
 
 
-state 134
+State 134
 
    12 method: PUBLIC type id RNDBR_L arglist RNDBR_R BTBR_L var_dec_list stmnt_list RETURN expression . SEMICOLON BTBR_R
    33 expression: expression . AND expression
@@ -1796,28 +1796,28 @@ state 134
     LESS       shift, and go to state 98
 
 
-state 135
+State 135
 
    13 method: PUBLIC type id RNDBR_L arglist RNDBR_R BTBR_L stmnt_list RETURN expression SEMICOLON . BTBR_R
 
     BTBR_R  shift, and go to state 143
 
 
-state 136
+State 136
 
    46 expression: NEW INT SQBR_L expression SQBR_R .
 
     $default  reduce using rule 46 (expression)
 
 
-state 137
+State 137
 
    28 statement: IF RNDBR_L expression RNDBR_R statement ELSE statement .
 
     $default  reduce using rule 28 (statement)
 
 
-state 138
+State 138
 
    33 expression: expression . AND expression
    34           | expression . LESS expression
@@ -1842,42 +1842,42 @@ state 138
     expression_add  go to state 144
 
 
-state 139
+State 139
 
    40 expression: expression DOT id RNDBR_L expression_list . RNDBR_R
 
     RNDBR_R  shift, and go to state 145
 
 
-state 140
+State 140
 
    32 statement: id SQBR_L expression SQBR_R EQ expression SEMICOLON .
 
     $default  reduce using rule 32 (statement)
 
 
-state 141
+State 141
 
    14 method: PUBLIC type id RNDBR_L arglist RNDBR_R BTBR_L var_dec_list RETURN expression SEMICOLON BTBR_R .
 
     $default  reduce using rule 14 (method)
 
 
-state 142
+State 142
 
    12 method: PUBLIC type id RNDBR_L arglist RNDBR_R BTBR_L var_dec_list stmnt_list RETURN expression SEMICOLON . BTBR_R
 
     BTBR_R  shift, and go to state 146
 
 
-state 143
+State 143
 
    13 method: PUBLIC type id RNDBR_L arglist RNDBR_R BTBR_L stmnt_list RETURN expression SEMICOLON BTBR_R .
 
     $default  reduce using rule 13 (method)
 
 
-state 144
+State 144
 
    50 expression_list: expression expression_add .
    52 expression_add: expression_add . COMMA expression
@@ -1887,21 +1887,21 @@ state 144
     $default  reduce using rule 50 (expression_list)
 
 
-state 145
+State 145
 
    40 expression: expression DOT id RNDBR_L expression_list RNDBR_R .
 
     $default  reduce using rule 40 (expression)
 
 
-state 146
+State 146
 
    12 method: PUBLIC type id RNDBR_L arglist RNDBR_R BTBR_L var_dec_list stmnt_list RETURN expression SEMICOLON BTBR_R .
 
     $default  reduce using rule 12 (method)
 
 
-state 147
+State 147
 
    52 expression_add: expression_add COMMA . expression
 
@@ -1918,7 +1918,7 @@ state 147
     id          go to state 74
 
 
-state 148
+State 148
 
    33 expression: expression . AND expression
    34           | expression . LESS expression

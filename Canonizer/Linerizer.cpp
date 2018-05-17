@@ -1,24 +1,22 @@
 #include "Linerizer.h"
 
-#include <../IR/Converters.h>
-#include <../IR/IRTree_classes.h>
-
 void Linerizer::Linerize(ISubtreeWrapper* wrapper, std::vector<IStm*> stms) {
     isPreviousDetached = false;
     statements = stms;
-    wrapper->accept(this);
+
+    // wrapper->accept(this);
 }
 
-void Linerizer::Visit(Seq* node) {
-    if (node->cur != nullptr) {
-        node->others->accept(this);
+void Linerizer::visit(SeqStm* node) {
+    if (node->left != nullptr) {
+        node->right->accept(this);
 
         if (isPreviousDetached) {
             isPreviousDetached = false;
         }
     }
-    if (node->cur != nullptr) {
-        node->cur->accept(this);
+    if (node->left != nullptr) {
+        node->left->accept(this);
 
         if (isPreviousDetached) {
             isPreviousDetached = false;
@@ -26,17 +24,17 @@ void Linerizer::Visit(Seq* node) {
     }
 }
 
-void Linerizer::Visit(StmWrapper* node) {
-    IStm* stm = node->to_stm();
+void Linerizer::visit(StmWrapper* node) {
+    IStm* stm = node->to_stmt();
     stm->accept(this);
 }
 
-void Linerizer::Visit(ExpWrapper* node) {
-    IStm* stm = node->to_stm();
+void Linerizer::visit(ExpWrapper* node) {
+    IStm* stm = node->to_stmt();
     stm->accept(this);
 }
 
 void Linerizer::addToStatements(IStm* stm) {
-    statements->push_back(stm);
+    statements.push_back(stm);
     isPreviousDetached = true;
 }

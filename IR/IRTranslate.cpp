@@ -124,7 +124,7 @@ void IRTranslate::visit(const MethodDecl* method_decl) {
 
 	if (lastStmtListBody.size() == 0) std::cout << "lastStmtListBody empty" << std::endl;
 
-	const IStm* body(new ExpStm(irtree,
+	IStm* body(new ExpStm(irtree,
 		new EseqExp(irtree, lastStmtListBody[lastStmtListBody.size()-1], lastWrapper->to_exp()))); // lastWrapper for return, lastStmtListBody for stmt lists 
 
 	lastWrapper = nullptr;
@@ -150,7 +150,7 @@ void IRTranslate::visit(const StatementList* statement_list) {
     	std::cout << "other not null" << std::endl;
         statement_list->other_statements_->accept(this);
         statement_list->statement_->accept(this);
-        const IStm* lastStmtListBody_ = lastStmtListBody[lastStmtListBody.size() - 1];
+        IStm* lastStmtListBody_ = lastStmtListBody[lastStmtListBody.size() - 1];
         lastStmtListBody.pop_back();
         lastStmtListBody.push_back(new SeqStm(irtree,lastStmtListBody_, lastWrapper->to_stmt()));
         std::cout << "ADDED LAST WRAPPER TO STMT LIST" << std::endl;
@@ -177,13 +177,13 @@ void IRTranslate::visit(const IfStatement* if_statement) {
     }
 
     if_statement->if_condition_->accept(this);
-    const ISubtreeWrapper* ifExpWrapper = lastWrapper;
+    ISubtreeWrapper* ifExpWrapper = lastWrapper;
 
 
 
     if_statement->statement_if_true_->accept(this);
 
-    const ISubtreeWrapper* thenStateWrapper;
+    ISubtreeWrapper* thenStateWrapper;
     if (typeid(*if_statement->statement_if_true_) == typeid(StatementList)) {
     	std::cout  << std::endl << "+++++++++++++LIST IN IF+++++++++++++" << std::endl << std::endl;
     	thenStateWrapper = new StmWrapper(irtree, lastStmtListBody[lastStmtListBody.size()-1]);
@@ -194,7 +194,7 @@ void IRTranslate::visit(const IfStatement* if_statement) {
     }
 
     if_statement->statement_if_false_->accept(this);
-    const ISubtreeWrapper* elseStateWrapper;
+    ISubtreeWrapper* elseStateWrapper;
     if (typeid(*if_statement->statement_if_false_) == typeid(StatementList)) {
     	std::cout  << std::endl << "+++++++++++++LIST IN IF+++++++++++++" << std::endl << std::endl;
     	elseStateWrapper = new StmWrapper(irtree, lastStmtListBody[lastStmtListBody.size() - 1]);
@@ -245,10 +245,10 @@ void IRTranslate::visit(const WhileStatement* while_statement) {
     }
 
     while_statement->loop_condition_->accept(this);
-    const ISubtreeWrapper* conditionExpWrapper = lastWrapper;
+    ISubtreeWrapper* conditionExpWrapper = lastWrapper;
     lastWrapper = nullptr;
     while_statement->inloop_statement_->accept(this);
-    const ISubtreeWrapper* inloopStmtWrapper;
+    ISubtreeWrapper* inloopStmtWrapper;
     if (typeid(*(while_statement->inloop_statement_)) == typeid(StatementList)) {
     	inloopStmtWrapper = new StmWrapper(irtree, lastStmtListBody[lastStmtListBody.size()-1]);
     	lastStmtListBody.pop_back();
@@ -303,7 +303,7 @@ void IRTranslate::visit(const AssignStatement* assign_statement) {
         return;
     }
 
-    const IExp* dst;
+    IExp* dst;
 
 	if (currentFrame->CheckLocalOrFormal(assign_statement->lhs_var_id_).first) {
 		std::cout << "local" << std::endl;
@@ -326,12 +326,12 @@ void IRTranslate::visit(const AssignSubscriptStatement* node) {
 
     node->subscript_->accept(this);
 
-    const IExp* dst;
+    IExp* dst;
 	if (currentFrame->CheckLocalOrFormal(node->lhs_array_id_).first) {
 
 		std::cout << "local" << std::endl;
 
-		const IExp* arr;
+		IExp* arr;
 
 		dst = new MemExp(irtree,
 			new BinopExp(irtree,
@@ -351,7 +351,7 @@ void IRTranslate::visit(const AssignSubscriptStatement* node) {
 
 		std::cout << "formal" << std::endl;
  
-		const IExp* arr;
+		IExp* arr;
 
 		arr = get_class_var_exp(node->lhs_array_id_);
 
@@ -370,7 +370,7 @@ void IRTranslate::visit(const AssignSubscriptStatement* node) {
 		lastWrapper = nullptr;
 	}
 
-	const IStm* body;
+	IStm* body;
 
 	node->rhs_expression_->accept(this);
 
@@ -392,10 +392,10 @@ void IRTranslate::visit(const BinaryExpression* binary_expression) {
     }
 
     binary_expression->lhs_expression_->accept(this);
-    const ISubtreeWrapper* left_wrapper = lastWrapper;
+    ISubtreeWrapper* left_wrapper = lastWrapper;
     lastWrapper = nullptr;
     binary_expression->rhs_expression_->accept(this);
-    const ISubtreeWrapper* right_wrapper = lastWrapper;
+    ISubtreeWrapper* right_wrapper = lastWrapper;
     lastWrapper = nullptr;
 
     switch (binary_expression->binary_operator_) {
@@ -478,7 +478,7 @@ void IRTranslate::visit(const MethodCallExpression* node) {
 	std::cout << "in visit method call exp" << std::endl;
 
 	node->expression_->accept(this);
-	const ISubtreeWrapper* classWrapper = lastWrapper;
+	ISubtreeWrapper* classWrapper = lastWrapper;
 	lastWrapper = nullptr;
 
 	std::cout << "before visit args" << std::endl;
@@ -518,7 +518,7 @@ void IRTranslate::visit(const ExpressionList* expression_list) {
     }
 
     expression_list->expression_->accept(this);
-    const IExp* head = lastWrapper->to_exp();
+    IExp* head = lastWrapper->to_exp();
     lastWrapper = nullptr;
 
     if (expression_list->other_expressions_) {
@@ -545,16 +545,15 @@ void IRTranslate::visit(const IdExpression* node) {
 
 	std::cout << "in visit id exp" << std::endl;
 
-	const IExp* dst;
+	IExp* dst;
 	if (currentFrame->CheckLocalOrFormal(node->id_).first) {
 		std::cout << "local" << std::endl;
-		const AR::IAccess* acc = currentFrame->CheckLocalOrFormal(node->id_).second;
+		AR::IAccess* acc = currentFrame->CheckLocalOrFormal(node->id_).second;
 		dst = acc->get_exp(irtree,currentFrame->FP());
 	} else {
 		std::cout << "formal" << std::endl;
 		dst = get_class_var_exp(node->id_);
 	}
-
 	lastWrapper = new ExpWrapper(irtree,dst);
 }
 
@@ -652,7 +651,7 @@ void IRTranslate::visit(const NegationExpression* node) {
 	lastWrapper = new ExpWrapper(irtree,body);
 }
 
-const IExp* IRTranslate::get_class_var_exp(const Symbol* varName) {
+IExp* IRTranslate::get_class_var_exp(const Symbol* varName) {
 
 	std::cout << std::endl << "+ + + + IN GET CLASS VAR EXP + + + + " << std::endl << std::endl;
 
@@ -705,7 +704,7 @@ const IExp* IRTranslate::get_class_var_exp(const Symbol* varName) {
 }
 
 
-const AR::IFrame* IRTranslate::get_frame_for_method(const SymbolTable::Symbol* id) {
+AR::IFrame* IRTranslate::get_frame_for_method(const SymbolTable::Symbol* id) {
 
 	Position pos;
 
@@ -735,13 +734,3 @@ const AR::IFrame* IRTranslate::get_frame_for_method(const SymbolTable::Symbol* i
 
 	
 }
-
-
-
-
-
-
-
-
-
-

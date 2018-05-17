@@ -17,10 +17,10 @@ namespace AR {
 		virtual void AddAddressReturnValue() = 0;
 		virtual int FormalsCount() const = 0;
 		virtual const IAccess* Formal(int index) const = 0;
-		virtual std::pair<bool, const IAccess*> CheckLocalOrFormal(const SymbolTable::Symbol* _name) const = 0;
+		virtual std::pair<bool, IAccess*> CheckLocalOrFormal(const SymbolTable::Symbol* _name) const = 0;
 		virtual const IAccess* ExitAddress() const = 0;
 		virtual const IAccess* ReturnAddress() const = 0;
-		virtual const Temp FP() const = 0;
+		virtual Temp FP() const = 0;
 	};
 
 }

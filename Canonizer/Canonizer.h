@@ -1,34 +1,36 @@
 #pragma once
 
 #include "../IR/IRTree_classes.h"
-#include "IRTreeVisitor.h"
+#include "../IR/IRTreeVisitor.h"
 
 class Canonizer: public IRTreeVisitor {
 public:
 
-	const IStm* body;
+	IStm* body;
 
-	Canonizer(const IStm* stm): body(stm) {};
+	Canonizer(IStm* stm): body(stm) {};
 
-	const IStm* reorder(IExp** exp);
+	void run() { body->accept(this); }
+
+	IStm* reorder(IExp** exp);
 	void decomposeEseq();
 	IStm* addSeqIfRequired(IStm* stm);
 
-	void visit(const ExpList*) override;
-	void visit(const MemExp*) override;
-	void visit(const ExpStm*) override;
-	void visit(const StmList*) override;
-	void visit(const ConstExp*) override;
-	void visit(const NameExp*) override;
-	void visit(const TempExp*) override;
-	void visit(const BinopExp*) override;
-	void visit(const CallExp*) override;
-	void visit(const EseqExp*) override;
-	void visit(const MoveStm*) override;
-	void visit(const JumpStm*) override;
-	void visit(const CJumpStm*) override;
-	void visit(const SeqStm*) override;
-	void visit(const LabelStm*) override {}
+	void visit(ExpList*) override;
+	void visit(MemExp*) override;
+	void visit(ExpStm*) override;
+	void visit(StmList*) override {};
+	void visit(ConstExp*) override;
+	void visit(NameExp*) override;
+	void visit(TempExp*) override;
+	void visit(BinopExp*) override;
+	void visit(CallExp*) override;
+	void visit(EseqExp*) override;
+	void visit(MoveStm*) override;
+	void visit(JumpStm*) override;
+	void visit(CJumpStm*) override;
+	void visit(SeqStm*) override;
+	void visit(LabelStm*) override {};
 
 	EseqExp* lastEseq;
 

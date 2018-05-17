@@ -4,25 +4,25 @@
 
 class LessExpWrapper : public ISubtreeWrapper {
 public:
-	LessExpWrapper(IRTree& _tree, const IExp* _left, const IExp* _right): 
+	LessExpWrapper(IRTree& _tree, IExp* _left, IExp* _right): 
 		left(_left), right(_right), tree(_tree) {}
 
-	const IExp* to_exp() const {
+	IExp* to_exp() const override{
 		return new BinopExp(tree, IRTree_OP::OP_BIN::MINUS_, right, left);
 	}
 
-	const IStm* to_stmt() const {
+	IStm* to_stmt() const override{
 		return new ExpStm(tree, this->to_exp());
 	}
 
-	const IStm* to_cond(const Label t, const Label f) const {
+	IStm* to_cond(const Label t, const Label f) const override {
 		std::cout << "less exp to cond" << std::endl;
 		return new CJumpStm(tree, IRTree_OP::OP_COMPARE::LT_, left, right, t, f);
 	}
 
 private:
-	const IExp* left;
-	const IExp* right;
+	IExp* left;
+	IExp* right;
 	IRTree& tree;
 };
 

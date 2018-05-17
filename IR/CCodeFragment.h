@@ -9,10 +9,10 @@
 struct CCodeFragment {
 	std::string fragmentName;
 	const AR::IFrame* frame;
-	const IStm* body;
+	IStm* body;
 	CCodeFragment* next=nullptr;
 
-	CCodeFragment(std::string _fragmentName, const AR::IFrame* _frame, const IStm* _body):	
+	CCodeFragment(std::string _fragmentName, const AR::IFrame* _frame, IStm* _body):	
 		fragmentName(_fragmentName), frame(_frame), body(_body) {};
 };
 

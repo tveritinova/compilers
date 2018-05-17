@@ -1,9 +1,7 @@
-
-#include "AST/grammar.h"
-#include "SymbolTable/tablevisitor.h"
-#include "SymbolTable/typechecker.h"
-#include "IR/IRTranslate.h"
-#include "Canonizer/Canonizer.h"
+#include "../SymbolTable/tablevisitor.h"
+#include "../SymbolTable/typechecker.h"
+#include "../IR/IRTranslate.h"
+#include "Canonizer.h"
 
 extern Program *program;
 extern int yyparse();
@@ -29,8 +27,8 @@ int main( int argc, char* argv[] ) {
         CCodeFragment* body = translator->programTranslation;
 
         while (body != nullptr) {
-            Canonizer* canonizer new Canonizer(body->body);
-            program->accept(canonizer);
+            Canonizer* canonizer = new Canonizer(body->body);
+            canonizer->run();
             body = body->next;
         }
 

@@ -25,7 +25,7 @@ namespace AR {
 			std::cout << "In frame position " << std::endl;
 		}
 
-		virtual const IExp* get_exp(IRTree& tree, const Temp framePtr) const override {
+		virtual IExp* get_exp(IRTree& tree, Temp framePtr) const override {
 		return new MemExp(tree,
 			new BinopExp(tree, IRTree_OP::OP_BIN::PLUS_, new TempExp(tree, framePtr), new ConstExp(tree, offset)), 
 			size);

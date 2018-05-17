@@ -1,28 +1,31 @@
 #pragma once
 
 #include "../IR/IRTree_classes.h"
-#include "IRTreeVisitor.h"
+#include "../IR/Converters.h"
+#include "../IR/IRTreeVisitor.h"
 
 class Linerizer: public IRTreeVisitor {
 public:
 
     void Linerize(ISubtreeWrapper* wrapper, std::vector<IStm*> stms);
 
-    void visit(const ExpList*) override {}
-    void visit(const MemExp*) override {}
-    void visit(const ExpStm*) override { addToStatements(node); }
-    void visit(const StmList*) override {}
-    void visit(const ConstExp*) override {}
-    void visit(const NameExp*) override {}
-    void visit(const TempExp*) override {}
-    void visit(const BinopExp*) override {}
-    void visit(const CallExp*) override {}
-    void visit(const EseqExp*) override {}
-    void visit(const MoveStm*) override { addToStatements(node); }
-    void visit(const JumpStm*) override { addToStatements(node); }
-    void visit(const CJumpStm*) override { addToStatements(node); }
-    void visit(const SeqStm*) override;
-    void visit(const LabelStm*) override { addToStatements(node); }
+    void visit(ExpList*) override {}
+    void visit(MemExp*) override {}
+    void visit(ExpStm* node) override { addToStatements(node); }
+    void visit(StmList*) override {}
+    void visit(ConstExp*) override {}
+    void visit(NameExp*) override {}
+    void visit(TempExp*) override {}
+    void visit(BinopExp*) override {}
+    void visit(CallExp*) override {}
+    void visit(StmWrapper*);
+    void visit(ExpWrapper*);
+    void visit(EseqExp*) override {}
+    void visit(MoveStm* node) override { addToStatements(node); }
+    void visit(JumpStm* node) override { addToStatements(node); }
+    void visit(CJumpStm* node) override { addToStatements(node); }
+    void visit(SeqStm*) override;
+    void visit(LabelStm* node) override { addToStatements(node); }
 
     bool isPreviousDetached;
     std::vector<IStm*> statements;

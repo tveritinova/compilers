@@ -34,7 +34,7 @@ namespace AR {
 		
 		virtual const IAccess* Formal(int index) const override;
 
-		virtual std::pair<bool, const IAccess*> CheckLocalOrFormal(const SymbolTable::Symbol* _name) const override;
+		virtual std::pair<bool, IAccess*> CheckLocalOrFormal(const SymbolTable::Symbol* _name) const override;
 		
 		virtual const IAccess* ExitAddress() const override;
 		virtual const IAccess* ReturnAddress() const override;
@@ -42,7 +42,7 @@ namespace AR {
 		const int FormalSize(int index) const;
 		const int FormalSize(const Symbol* name) const;
 				
-		virtual const Temp FP() const override;
+		virtual Temp FP() const override;
 
 	private:
 

@@ -5,10 +5,10 @@
 
 class OrExpWrapper : public ISubtreeWrapper {
 public:
-	OrExpWrapper(IRTree& _tree, const IExp* _left, const ISubtreeWrapper* _right): 
+	OrExpWrapper(IRTree& _tree, IExp* _left, ISubtreeWrapper* _right): 
 		left(_left), right(_right), tree(_tree) {}
 
-	const IExp* ToExp() const {
+	IExp* to_exp() const override{
 		Temp temp("temp");
 		Label t("true");
 		Label f("false");
@@ -30,11 +30,11 @@ public:
 				new MemExp(tree,new TempExp(tree,temp), booleanSize)));
 	}
 
-	const IStm* ToStm() const {
+	IStm* to_stmt() const override{
 		return new ExpStm(tree,this->to_exp());
 	}
 
-	const IStm* ToConditional(const Label t, const Label f) const {
+	IStm* to_cond(const Label t, const Label f) const override{
 		std::cout << "or exp to cond" << std::endl;
 		Label z("rightFalse");
 		return new SeqStm(tree,
@@ -45,8 +45,8 @@ public:
 	}
 
 private:
-	const IExp* left;
-	const ISubtreeWrapper* right;
+	IExp* left;
+	ISubtreeWrapper* right;
 	IRTree& tree;
 };
 

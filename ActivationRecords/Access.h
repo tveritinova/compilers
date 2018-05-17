@@ -34,7 +34,7 @@ namespace AR {
 		virtual const T_RecordsType get_type() = 0;
 		virtual const int get_size() const = 0;
 		virtual void print(const Temp* fp) const = 0;
-		virtual const IExp* get_exp(IRTree& tree, const Temp framePtr) const = 0;
+		virtual IExp* get_exp(IRTree& tree, Temp framePtr) const = 0;
 	};
 
 }

@@ -25,7 +25,7 @@ namespace AR {
 			std::cout << "Register: " << reg_number << std::endl; 
 		}
 
-		virtual const IExp* get_exp(IRTree& tree, const Temp framePtr) const override {
+		virtual IExp* get_exp(IRTree& tree, Temp framePtr) const override {
 			return new TempExp(tree, temp);
 		}
 

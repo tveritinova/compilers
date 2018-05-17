@@ -20,7 +20,7 @@ class MemExp;
 
 #include "IRTree.h"
 #include "Temp.h"
-#include "../Canonizer/IRTreeVisitor.h"
+#include "IRTreeVisitor.h"
 
 
 struct Label {
@@ -33,10 +33,10 @@ class IExp {
 public:
 	std::string id="";
 	virtual ~IExp() {}
-	virtual void print(IRTree& tree) const= 0;
+	virtual void print(IRTree& tree) const = 0;
 	std::string label;
 
-	virtual void accept(IRTreeVisitor* visitor) const = 0;
+	virtual void accept(IRTreeVisitor* visitor) = 0;
 	virtual bool IsCommutative() const = 0;
 	virtual bool IsAbsolutelyCommutative() const = 0;
 };
@@ -45,10 +45,10 @@ public:
 class ExpList {
 public:
 
-	const IExp* cur;
-	const ExpList* others;
+	IExp* cur;
+	ExpList* others;
 
-	ExpList(const IExp* _cur, const ExpList* _others): cur(_cur), others(_others) {};
+	ExpList(IExp* _cur, ExpList* _others): cur(_cur), others(_others) {};
 
 	void print(IRTree& tree) const {
 		std::cout << "in print exp list" << std::endl;
@@ -65,7 +65,7 @@ public:
 		}
 	}
 
-	void accept(IRTreeVisitor* visitor) const {
+	void accept(IRTreeVisitor* visitor) {
         visitor->visit(this);
     }
 
@@ -80,18 +80,18 @@ public:
 	std::string label;
 
 
-	virtual void accept(IRTreeVisitor* visitor) const = 0;
+	virtual void accept(IRTreeVisitor* visitor) = 0;
 
 };
 
 class StmList {
 public:
-	const IStm* cur;
-	const StmList* others;
+	IStm* cur;
+	StmList* others;
 
-	StmList(const IStm* _cur, const StmList* _others) : cur(_cur), others(_others) {};
+	StmList(IStm* _cur, StmList* _others) : cur(_cur), others(_others) {};
 
-	void accept(IRTreeVisitor* visitor) const {
+	void accept(IRTreeVisitor* visitor) {
         visitor->visit(this);
     }
 };
@@ -120,7 +120,7 @@ public:
 			std::to_string(value));
 	}
 
-	void accept(IRTreeVisitor* visitor) const {
+	void accept(IRTreeVisitor* visitor) {
         visitor->visit(this);
     }
 
@@ -144,7 +144,7 @@ public:
 		std::cout << "end print name exp" << std::endl;
 	}
 
-	void accept(IRTreeVisitor* visitor) const {
+	void accept(IRTreeVisitor* visitor) {
         visitor->visit(this);
     }
 
@@ -169,7 +169,7 @@ public:
 		tree.add_record(id, label, tree.get_tree_name(temp.tName), temp.tName);
 	}
 
-	void accept(IRTreeVisitor* visitor) const {
+	void accept(IRTreeVisitor* visitor) {
         visitor->visit(this);
     }
 
@@ -180,10 +180,12 @@ public:
 class BinopExp : public IExp {
 public:
 	const IRTree_OP::OP_BIN binop;
-	const IExp* left;
-	const IExp* right;
 
-	BinopExp(IRTree& tree, IRTree_OP::OP_BIN _binop, const IExp* _left, const IExp* _right): 
+	//CONST
+	IExp* left;
+	IExp* right;
+
+	BinopExp(IRTree& tree, IRTree_OP::OP_BIN _binop, IExp* _left, IExp* _right): 
 		binop(_binop), left(_left), right(_right){
 		label = IRTree_OP::bin_to_string(_binop);
 		id = tree.get_tree_name(label);
@@ -198,7 +200,7 @@ public:
 		right->print(tree);
 	}
 
-	void accept(IRTreeVisitor* visitor) const {
+	void accept(IRTreeVisitor* visitor) {
         visitor->visit(this);
     }
 
@@ -209,10 +211,10 @@ public:
 
 class MemExp : public IExp {
 public:
-	const IExp* exp; 
+	IExp* exp; 
 	const int size; 
 
-	MemExp(IRTree& tree, const IExp* _exp, int _size): exp(_exp), size(_size){
+	MemExp(IRTree& tree, IExp* _exp, int _size): exp(_exp), size(_size){
 		//std::cout << "create mem exp" << std::endl;
 		label = "MEM";
 		id = tree.get_tree_name(label);
@@ -228,7 +230,7 @@ public:
 		exp->print(tree);
 	}
 
-	void accept(IRTreeVisitor* visitor) const {
+	void accept(IRTreeVisitor* visitor) {
         visitor->visit(this);
     }
 
@@ -240,10 +242,10 @@ public:
 
 class CallExp : public IExp {
 public:
-	const IExp* func;
+	IExp* func;
 	ExpList* args;
 
-	CallExp(IRTree& tree, const IExp* _func, ExpList* _args): func(_func),args(_args) {
+	CallExp(IRTree& tree, IExp* _func, ExpList* _args): func(_func),args(_args) {
 		label = "CALL";
 		id = tree.get_tree_name(label);
 		std::cout << "create call expr " << id << std::endl;
@@ -264,7 +266,7 @@ public:
 		args->print(tree);
 	}
 
-	void accept(IRTreeVisitor* visitor) const {
+	void accept(IRTreeVisitor* visitor) {
         visitor->visit(this);
     }
 
@@ -275,10 +277,10 @@ public:
 
 class EseqExp : public IExp {
 public:
-	const IStm* stm;
-	const IExp* exp;
+	IStm* stm;
+	IExp* exp;
 
-	EseqExp(IRTree& tree, const IStm* _stm, const IExp* _exp) : stm(_stm), exp(_exp) {
+	EseqExp(IRTree& tree, IStm* _stm, IExp* _exp) : stm(_stm), exp(_exp) {
 		label = "ESEQ";
 		id = tree.get_tree_name(label);
 		std::cout << "create eseq expr " << id << std::endl;
@@ -296,7 +298,7 @@ public:
 		exp->print(tree);
 	}
 
-	void accept(IRTreeVisitor* visitor) const {
+	void accept(IRTreeVisitor* visitor) {
         visitor->visit(this);
     }
 
@@ -315,10 +317,10 @@ public:
 
 class MoveStm : public IStm {
 public:
-	const IExp* left;
-	const IExp* right;
+	IExp* left;
+	IExp* right;
 
-	MoveStm(IRTree& tree, const IExp* _left, const IExp* _right) : left(_left), right(_right) {
+	MoveStm(IRTree& tree, IExp* _left, IExp* _right) : left(_left), right(_right) {
 		label = "MOVE";
 		id = tree.get_tree_name(label);
 		//std::cout << std::endl << "++++++" << std::endl << std::endl;
@@ -334,7 +336,7 @@ public:
 		right->print(tree);
 	}
 
-	void accept(IRTreeVisitor* visitor) const {
+	void accept(IRTreeVisitor* visitor) {
         visitor->visit(this);
     }
 };
@@ -343,9 +345,9 @@ public:
 
 class ExpStm : public IStm {
 public:
-	const IExp* exp;
+	IExp* exp;
 
-	ExpStm(IRTree& tree, const IExp* _exp) : exp(_exp) {
+	ExpStm(IRTree& tree, IExp* _exp) : exp(_exp) {
 		label = "EXP";
 		id = tree.get_tree_name(label);
 		std::cout << "create exp stmt " << id << std::endl;
@@ -358,7 +360,7 @@ public:
 		exp->print(tree);
 	}
 
-	void accept(IRTreeVisitor* visitor) const {
+	void accept(IRTreeVisitor* visitor) {
         visitor->visit(this);
     }
 
@@ -367,10 +369,10 @@ public:
 
 class JumpStm : public IStm {
 public:
-	const IExp* exp; 
+	IExp* exp; 
 	const std::vector<Label> targets; 
 
-	JumpStm(IRTree& tree, const IExp* _exp, const std::vector<Label> _targets): 
+	JumpStm(IRTree& tree, IExp* _exp, const std::vector<Label> _targets): 
 		exp(_exp), targets(_targets) {
 		label = "JUMP";
 		id = tree.get_tree_name(label);
@@ -385,7 +387,7 @@ public:
 		exp->print(tree);
 	}
 
-	void accept(IRTreeVisitor* visitor) const {
+	void accept(IRTreeVisitor* visitor) {
         visitor->visit(this);
     }
 };
@@ -394,12 +396,12 @@ public:
 class CJumpStm : public IStm {
 public:
 	const IRTree_OP::OP_COMPARE relop;
-	const IExp* left;
-	const IExp* right;
+	IExp* left;
+	IExp* right;
 	Label iftrue;
 	Label iffalse;
 
-	CJumpStm(IRTree& tree, const IRTree_OP::OP_COMPARE _relop, const IExp* _left, const IExp* _right, 
+	CJumpStm(IRTree& tree, const IRTree_OP::OP_COMPARE _relop, IExp* _left, IExp* _right, 
 		Label _iftrue, Label _iffalse) :
 		relop(_relop), left(_left), right(_right), 
 		iftrue(_iftrue), iffalse(_iffalse) {
@@ -419,7 +421,7 @@ public:
 		right->print(tree);
 	}
 
-	void accept(IRTreeVisitor* visitor) const {
+	void accept(IRTreeVisitor* visitor) {
         visitor->visit(this);
     }
 };
@@ -427,10 +429,10 @@ public:
 
 class SeqStm :public IStm {
 public:
-	const IStm* left;
-	const IStm* right;
+	IStm* left;
+	IStm* right;
 
-	SeqStm(IRTree& tree, const IStm* _left, const IStm* _right) : left(_left), right(_right) {
+	SeqStm(IRTree& tree, IStm* _left, IStm* _right) : left(_left), right(_right) {
 		label = "SEQ";
 		id = tree.get_tree_name(label);
 		std::cout << "create seq stmt " << id << std::endl;
@@ -456,7 +458,7 @@ public:
 		}
 	}
 
-	void accept(IRTreeVisitor* visitor) const {
+	void accept(IRTreeVisitor* visitor) {
         visitor->visit(this);
     }
 };
@@ -478,7 +480,7 @@ public:
 		tree.add_record(id, label, tree.get_tree_name(label_class.lName), label_class.lName);
 	}
 
-	void accept(IRTreeVisitor* visitor) const {
+	void accept(IRTreeVisitor* visitor) {
         visitor->visit(this);
     }
 };

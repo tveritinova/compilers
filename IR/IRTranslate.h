@@ -72,8 +72,8 @@ private:
 	IRTree irtree;
 
 	ISubtreeWrapper* lastWrapper = nullptr;
-	std::vector<const IStm*> lastStmtListBody;
-	const ExpList* lastExpListBody = nullptr;
+	std::vector<IStm*> lastStmtListBody;
+	ExpList* lastExpListBody = nullptr;
 	CCodeFragment* lastTranslation = nullptr;
 	CCodeFragment* resultTranslation = nullptr;
 
@@ -85,8 +85,8 @@ private:
 
 	const AR::IFrame* currentFrame;
 
-	const AR::IFrame* get_frame_for_method(const SymbolTable::Symbol*);
-	const IExp* get_class_var_exp(const SymbolTable::Symbol* varName);
+	AR::IFrame* get_frame_for_method(const SymbolTable::Symbol*);
+	IExp* get_class_var_exp(const SymbolTable::Symbol* varName);
 };
 
 #endif

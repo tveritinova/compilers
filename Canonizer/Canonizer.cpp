@@ -5,7 +5,7 @@
 
 
 // поднимает вверх eseq
-const IStm* Canonizer::reorder(IExp** exp) {
+IStm* Canonizer::reorder(IExp** exp) {
     (*exp)->accept(this);
     decomposeEseq();
     *exp = lastEseq->exp;
@@ -34,10 +34,10 @@ IStm* Canonizer::addSeqIfRequired(IStm* stm) {
     if (lastEseq->stm == nullptr) {
         return stm;
     }
-    return new Seq(tree, lastEseq->stm, stm);
+    return new SeqStm(tree, lastEseq->stm, stm);
 }
 
-void Canonizer::visit(const ExpList* e) {
+void Canonizer::visit(ExpList* e) {
 
     if (e->cur != nullptr) {
         IStm* stm = reorder(&(e->cur));
@@ -48,10 +48,11 @@ void Canonizer::visit(const ExpList* e) {
 
     if (e->others != nullptr) {
         e->others->accept(this);
-        e->others = lastEseq->exp;
+        e->others->cur = lastEseq->exp;
+        e->others->others = nullptr;
     }
 
-    lastEseq->exp = e;
+    lastEseq->exp = e->cur;
 }
 
 /*void Canonizer::visit(const StmList* e) {
@@ -63,19 +64,19 @@ void Canonizer::visit(const ExpList* e) {
     others->accept(this);
 }*/
 
-void Canonizer::visit(const ConstExp* e) {
-    lastEseq->exp = exp;
+void Canonizer::visit(ConstExp* e) {
+    lastEseq->exp = e;
 }
 
-void Canonizer::visit(const NameExp* e) {
-    lastEseq->exp = exp;
+void Canonizer::visit(NameExp* e) {
+    lastEseq->exp = e;
 }
 
-void Canonizer::visit(const TempExp* e) {
-    lastEseq->exp = exp;
+void Canonizer::visit(TempExp* e) {
+    lastEseq->exp = e;
 }
 
-void Canonizer::visit(const BinopExp* e) {
+void Canonizer::visit(BinopExp* e) {
 
     IStm* leftStatements = reorder(&(e->left));
     IStm* rightStatements = reorder(&(e->right));
@@ -84,8 +85,8 @@ void Canonizer::visit(const BinopExp* e) {
     lastEseq->exp = e;
 }
 
-void Canonizer::visit(const MemExp* e) {
-    const IExp* pointer = e->exp;
+void Canonizer::visit(MemExp* e) {
+    IExp* pointer = e->exp;
     int size = e->size;
 
     e->exp->accept(this);
@@ -94,7 +95,7 @@ void Canonizer::visit(const MemExp* e) {
 }
 
 
-void Canonizer::visit(const CallExp* e) {
+void Canonizer::visit(CallExp* e) {
     const IExp* func = e->func;
     ExpList* args = e->args;
 
@@ -104,16 +105,16 @@ void Canonizer::visit(const CallExp* e) {
     lastEseq->exp = e;
 }
 
-void Canonizer::visit(const EseqExp* e) {
+void Canonizer::visit(EseqExp* e) {
 
     e->stm->accept(this);
     lastEseq->stm = reorder(&(e->exp));
     lastEseq->exp = e->exp;
 }
 
-void Canonizer::visit(const MoveStm* e) {
-    const IExp* left = e->left;
-    const IExp* right = e->right;
+void Canonizer::visit(MoveStm* e) {
+    IExp* left = e->left;
+    IExp* right = e->right;
 
 
     IStm* src = reorder(&(e->left));
@@ -129,7 +130,7 @@ void Canonizer::visit(const MoveStm* e) {
     lastEseq->stm = addSeqIfRequired(e);
 }
 
-void Canonizer::visit(const ExpStm* e) {
+void Canonizer::visit(ExpStm* e) {
 
     IStm* stm = reorder(&(e->exp));
 
@@ -140,14 +141,14 @@ void Canonizer::visit(const ExpStm* e) {
     lastEseq->stm = addSeqIfRequired(e);
 }
 
-void Canonizer::visit(const JumpStm* e) {
+void Canonizer::visit(JumpStm* e) {
     lastEseq->stm = addSeqIfRequired(e);
 }
 
-void Canonizer::visit(const CJumpStm* e) {
+void Canonizer::visit(CJumpStm* e) {
 
-    IStm* leftStatements = = reorder(&(e->left));
-    IStm* rightStatements = = reorder(&(e->right));
+    IStm* leftStatements = reorder(&(e->left));
+    IStm* rightStatements = reorder(&(e->right));
 
     if (leftStatements != nullptr) {
         lastEseq->stm = addSeqIfRequired(leftStatements);
@@ -160,9 +161,9 @@ void Canonizer::visit(const CJumpStm* e) {
     lastEseq->stm = addSeqIfRequired(e);
 }
 
-void Canonizer::visit(const SeqStm* e) {
-    const IStm* left = e->left;
-    const IStm* right = e->right;
+void Canonizer::visit(SeqStm* e) {
+    IStm* left = e->left;
+    IStm* right = e->right;
 
     left->accept(this);
     right->accept(this);

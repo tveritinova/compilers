@@ -87,7 +87,7 @@ namespace AR {
 		return formalList[index];
 	}
 
-	std::pair<bool, const IAccess*> X86MiniJavaFrame::CheckLocalOrFormal(const SymbolTable::Symbol* name) const {
+	std::pair<bool, IAccess*> X86MiniJavaFrame::CheckLocalOrFormal(const SymbolTable::Symbol* name) const {
 
 		/*std::cout << "~~~ locals ~~~" << std::endl;
 		for (auto it: localAccess) {
@@ -142,7 +142,7 @@ namespace AR {
 		return res->second->get_size();
 	}
 
-	const Temp X86MiniJavaFrame::FP() const {
+	Temp X86MiniJavaFrame::FP() const {
 		//return new IRTree::Temp(formalTopPointer);
 		return fp;
 	}
