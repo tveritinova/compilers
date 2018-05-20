@@ -67,9 +67,10 @@ public:
 	void visit(const NewObjectExpression*);
 	void visit(const NegationExpression*);
 
-private:
 
 	IRTree irtree;
+
+public:
 
 	ISubtreeWrapper* lastWrapper = nullptr;
 	std::vector<IStm*> lastStmtListBody;

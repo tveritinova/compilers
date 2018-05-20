@@ -1,7 +1,7 @@
 #pragma once 
 
 #include "../IR/IRTree_classes.h"
-#include <vector.h>
+#include <vector>
 
 class IInstruction {
 public:
@@ -20,25 +20,25 @@ public:
         while ((pos = s.find("%")) < s.size()) {
             instructionString += s.substr(0, pos);
             if(s[pos+1] == 'l') {
-                instructionString += labelList.at(0)->GetName();
+                instructionString += labelList.at(0).lName;
             } else if(s[pos+1] - '0' < dst.size()) {
                 assert(dst.size() > 0);
-                instructionString += "r" + dst[0]->Name() + std::to_string(dst[0]->Id);
+                instructionString += "r" + dst[0].tName + dst[0].Id;
             } else {
                 unsigned int srcPos = s[pos+1] - '0' - dst.size();
                 assert(src.size() > srcPos);
-                instructionString += "r" + src[srcPos]->Name() + std::to_string(src[srcPos]->Id);
+                instructionString += "r" + src[srcPos].tName + src[srcPos].Id;
             }
             s.erase(0, pos + 2);
         }
         instructionString += s;
         instructionString += "\tUsed:";
         for(auto& tmp: src) {
-            instructionString += " r" + tmp->Name() + std::to_string(tmp->Id) + ";";
+            instructionString += " r" + tmp.tName + tmp.Id + ";";
         }
         instructionString += "\tDefined:";
         for(auto& tmp: dst) {
-            instructionString += " r" + tmp->Name() + std::to_string(tmp->Id) + ";";
+            instructionString += " r" + tmp.tName + tmp.Id + ";";
         }
         return instructionString;
     }
@@ -52,24 +52,24 @@ protected:
 
 class MoveInstruction : public IInstruction {
 public:
-    MoveInstruction(const Temp* from, const Temp* to): fromConst(0) {
+    MoveInstruction(Temp from, Temp to): fromConst(0) {
         src.push_back(from);
         dst.push_back(to);
     }
-    MoveInstruction(const std::vector<TempList>&& from) {
+    MoveInstruction(const std::vector<Temp>&& from) {
         src = from;
     }
-    MoveInstruction(const Const* from, const Temp* to): fromConst(from) { dst.push_back(to); }
+    MoveInstruction(const ConstExp* from, Temp to): fromConst(from) { dst.push_back(to); }
 
 private:
-    const Const* fromConst;
+    const ConstExp* fromConst;
 };
 
 class LabelInstruction: public IInstruction {
 public:
-    LabelInstruction( const Label* l ) { labelList.push_back(l); }
+    LabelInstruction(Label l) { labelList.push_back(l); }
     virtual std::string Format() const override {
-        return labelList[0]->GetName() + ":";
+        return labelList[0].lName + ":";
     }
 };
 

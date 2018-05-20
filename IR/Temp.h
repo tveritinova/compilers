@@ -8,6 +8,7 @@
 struct Temp {
 
 	std::string tName;
+	std::string Id;
 
 	Temp(std::string _tName): tName(_tName) {}
 };

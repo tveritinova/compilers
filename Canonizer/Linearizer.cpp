@@ -1,13 +1,13 @@
-#include "Linerizer.h"
+#include "Linearizer.h"
 
-void Linerizer::Linerize(ISubtreeWrapper* wrapper, std::vector<IStm*> stms) {
+void Linearizer::Linearize(ISubtreeWrapper* wrapper, std::vector<IStm*> stms) {
     isPreviousDetached = false;
     statements = stms;
 
-    // wrapper->accept(this);
+    //wrapper->accept(this);
 }
 
-void Linerizer::visit(SeqStm* node) {
+void Linearizer::visit(SeqStm* node) {
     if (node->left != nullptr) {
         node->right->accept(this);
 
@@ -24,17 +24,17 @@ void Linerizer::visit(SeqStm* node) {
     }
 }
 
-void Linerizer::visit(StmWrapper* node) {
+void Linearizer::visit(StmWrapper* node) {
     IStm* stm = node->to_stmt();
     stm->accept(this);
 }
 
-void Linerizer::visit(ExpWrapper* node) {
+void Linearizer::visit(ExpWrapper* node) {
     IStm* stm = node->to_stmt();
     stm->accept(this);
 }
 
-void Linerizer::addToStatements(IStm* stm) {
+void Linearizer::addToStatements(IStm* stm) {
     statements.push_back(stm);
     isPreviousDetached = true;
 }

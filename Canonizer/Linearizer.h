@@ -4,10 +4,10 @@
 #include "../IR/Converters.h"
 #include "../IR/IRTreeVisitor.h"
 
-class Linerizer: public IRTreeVisitor {
+class Linearizer: public IRTreeVisitor {
 public:
 
-    void Linerize(ISubtreeWrapper* wrapper, std::vector<IStm*> stms);
+    void Linearize(ISubtreeWrapper* wrapper, std::vector<IStm*> stms);
 
     void visit(ExpList*) override {}
     void visit(MemExp*) override {}

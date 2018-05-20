@@ -1,17 +1,26 @@
 
-all: parser table irtree canonizer
+all: parser table irtree canonizer_run code_generation
+
+code_generation: CodeGeneration.o InstructionSet.o Symbol.o MethodInfo.o lex.o parser.o Table.o ClassInfo.o IRTranslate.o X86MiniJavaFrame.o typechecker.o
+	g++ -g --std=c++14 run_generation.cpp -o code_generation CodeGeneration.o InstructionSet.o Symbol.o MethodInfo.o lex.o parser.o Table.o ClassInfo.o IRTranslate.o X86MiniJavaFrame.o typechecker.o
+
+CodeGeneration.o:
+	g++ -g --std=c++14 -c CodeGeneration/CodeGeneration.cpp -o CodeGeneration.o
+
+InstructionSet.o:
+	g++ -g --std=c++14 -c CodeGeneration/InstructionSet.cpp -o InstructionSet.o
 
 irtree: tablevisitor.o Symbol.o MethodInfo.o lex.o parser.o Table.o ClassInfo.o IRTranslate.o X86MiniJavaFrame.o visitor.o tablevisitor.o
 	g++ -g --std=c++14 -Wno-write-strings irtree_exec.cpp -o irtree Symbol.o MethodInfo.o lex.o parser.o Table.o ClassInfo.o IRTranslate.o X86MiniJavaFrame.o visitor.o typechecker.o
 
-canonizer: Canonizer.o Linerizer.o Symbol.o MethodInfo.o lex.o parser.o Table.o ClassInfo.o IRTranslate.o X86MiniJavaFrame.o tablevisitor.o
-	g++ -g  --std=c++14 Canonizer/canonizer_run.cpp -o canonizer Canonizer.o Linerizer.o Symbol.o MethodInfo.o lex.o parser.o Table.o ClassInfo.o IRTranslate.o X86MiniJavaFrame.o typechecker.o
+canonizer_run: Canonizer.o Linearizer.o Symbol.o MethodInfo.o lex.o parser.o Table.o ClassInfo.o IRTranslate.o X86MiniJavaFrame.o tablevisitor.o
+	g++ -g  --std=c++14 Canonizer/canonizer_run.cpp -o canonizer_run Canonizer.o Linearizer.o Symbol.o MethodInfo.o lex.o parser.o Table.o ClassInfo.o IRTranslate.o X86MiniJavaFrame.o typechecker.o
 
 Canonizer.o:
 	g++ -g --std=c++14 -c Canonizer/Canonizer.cpp -o Canonizer.o
 
-Linerizer.o:
-	g++ -g --std=c++14 -c Canonizer/Linerizer.cpp -o Linerizer.o
+Linearizer.o:
+	g++ -g --std=c++14 -c Canonizer/Linearizer.cpp -o Linearizer.o
 
 IRTranslate.o:
 	g++ -g --std=c++14 -c IR/IRTranslate.cpp -o IRTranslate.o
@@ -56,7 +65,7 @@ visitor.o: AST/treeserializer.cpp
 	g++ -g -c --std=c++14 AST/treeserializer.cpp -o visitor.o
 
 clean:
-	rm  lex.yy.cc bison_code.tab.c bison_code.tab.h lex.o visitor.o parser.o parser Table.o Symbol.o ClassInfo.o MethodInfo.o table_.o tree.o typechecker.o X86MiniJavaFrame.o irtree table IRTranslate.o Canonizer.o Linerizer.o  canonizer
+	rm  lex.yy.cc bison_code.tab.c bison_code.tab.h lex.o visitor.o parser.o parser Table.o Symbol.o ClassInfo.o MethodInfo.o table_.o tree.o typechecker.o X86MiniJavaFrame.o irtree table IRTranslate.o Canonizer.o Linearizer.o canonizer_run code_generation CodeGeneration.o InstructionSet.o
 
 
 

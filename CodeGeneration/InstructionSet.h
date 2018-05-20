@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Instruction.h"
+#include "../IR/Temp.h"
 
 enum Regs {
     EAX,
@@ -31,7 +32,7 @@ public:
 
 class RegMove: public MoveInstruction {
 public:
-    RegMove(const std::string code, const Temp* from, const IR::Temp* to);
+    RegMove(const std::string code, const Temp* from, const Temp* to);
     RegMove(const std::string code, const std::vector<Temp> from);
-    RegMove(const std::string code, const Const* from, const Temp* to);
+    RegMove(const std::string code, const ConstExp* from, const Temp* to);
 };
